@@ -244,7 +244,7 @@
         // Load competitions and seasons
         const [compData, seasonData] = await Promise.all([
           DB.get('competitions'),
-          DB.rawGet('ark_seasons')
+          DB.get('seasons')
         ]);
         
         const compDataObj = compData || {};
