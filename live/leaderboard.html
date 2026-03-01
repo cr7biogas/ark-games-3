@@ -3,182 +3,241 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>🏆 Leaderboard - ARK Games 2.0</title>
+  <title>🏆 Leaderboard - ARK Games 3.0</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="../assets/css/live.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Leaderboard specific styles */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0a0a12;
-      color: #fff;
-      min-height: 100vh;
+      background: 
+        linear-gradient(135deg, rgba(10, 10, 18, 0.98), rgba(26, 26, 46, 0.95)),
+        url('../assets/images/texture-grunge.webp') center/cover fixed;
+    }
+    
+    .back-btn {
+      position: fixed;
+      top: var(--space-4);
+      left: var(--space-4);
+      color: var(--color-gray);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.6);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--border-radius-md);
+      backdrop-filter: blur(10px);
+      transition: var(--transition-base);
+    }
+    .back-btn:hover {
+      color: var(--color-white);
+      background: var(--color-rust);
+    }
+    
+    .fullscreen-btn {
+      position: fixed;
+      top: var(--space-4);
+      right: var(--space-4);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--border-radius-md);
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      transition: var(--transition-base);
+    }
+    .fullscreen-btn:hover {
+      background: var(--color-rust);
     }
     
     .header {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      padding: 20px;
+      background: linear-gradient(135deg, var(--color-charcoal), rgba(0, 0, 0, 0.8));
+      padding: var(--space-8) var(--space-6);
       text-align: center;
+      border-bottom: 2px solid var(--color-rust);
     }
     .header h1 {
-      font-size: 28px;
-      margin-bottom: 5px;
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-black);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
+    }
+    .header h1 span {
+      color: var(--color-rust);
     }
     .header p {
-      color: #888;
-      font-size: 14px;
+      color: var(--color-gray);
+      font-size: var(--text-base);
+      margin-top: var(--space-2);
     }
     
     .tabs {
       display: flex;
-      background: #1a1a2e;
-      padding: 10px;
-      gap: 8px;
-      overflow-x: auto;
       justify-content: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
     }
     .tab {
-      padding: 12px 24px;
-      border-radius: 25px;
-      border: none;
-      background: #333;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--border-radius-full);
+      border: 2px solid transparent;
+      background: var(--color-dark-gray);
+      color: var(--color-white);
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
       cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-    .tab.active {
-      background: linear-gradient(135deg, #e94560, #ff6b6b);
+      transition: var(--transition-base);
     }
     .tab:hover:not(.active) {
-      background: #444;
+      border-color: var(--color-rust);
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--color-rust), var(--color-amber));
+      box-shadow: var(--glow-rust);
     }
     
     .content {
-      padding: 20px;
-      max-width: 900px;
+      padding: var(--space-6);
+      max-width: 1100px;
       margin: 0 auto;
     }
     
     .leaderboard {
-      background: #1a1a2e;
-      border-radius: 20px;
+      background: var(--color-charcoal);
+      border-radius: var(--border-radius-xl);
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .lb-header {
       display: grid;
-      grid-template-columns: 60px 1fr repeat(var(--wod-count, 4), 80px) 80px;
-      padding: 15px 20px;
-      background: #252542;
-      font-size: 12px;
-      color: #888;
+      grid-template-columns: 70px 1fr repeat(var(--wod-count, 4), 90px) 90px;
+      padding: var(--space-4) var(--space-5);
+      background: rgba(0, 0, 0, 0.4);
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-bold);
+      color: var(--color-gray);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: var(--tracking-widest);
     }
     
     .lb-row {
       display: grid;
-      grid-template-columns: 60px 1fr repeat(var(--wod-count, 4), 80px) 80px;
-      padding: 15px 20px;
-      border-bottom: 1px solid #333;
+      grid-template-columns: 70px 1fr repeat(var(--wod-count, 4), 90px) 90px;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       align-items: center;
-      transition: background 0.2s;
+      transition: var(--transition-base);
     }
     .lb-row:last-child {
       border-bottom: none;
     }
     .lb-row:hover {
-      background: rgba(255,255,255,0.03);
+      background: rgba(233, 69, 96, 0.1);
     }
     
     .lb-rank {
-      font-size: 24px;
-      font-weight: 800;
-      color: #888;
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-black);
+      color: var(--color-gray);
     }
-    .lb-row:nth-child(1) .lb-rank { color: #ffd700; }
-    .lb-row:nth-child(2) .lb-rank { color: #c0c0c0; }
-    .lb-row:nth-child(3) .lb-rank { color: #cd7f32; }
+    .lb-row:nth-child(1) .lb-rank {
+      background: linear-gradient(135deg, #ffd700, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .lb-row:nth-child(2) .lb-rank {
+      background: linear-gradient(135deg, #c0c0c0, #95a5a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .lb-row:nth-child(3) .lb-rank {
+      background: linear-gradient(135deg, #cd7f32, #a04000);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
     
     .lb-team {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-4);
     }
     .lb-team .emoji {
-      font-size: 32px;
+      font-size: 2rem;
     }
     .lb-team .name {
-      font-size: 18px;
-      font-weight: 600;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
     }
     
     .lb-score {
       text-align: center;
-      font-size: 14px;
     }
     .lb-score .value {
-      font-weight: 700;
-      font-size: 16px;
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-base);
     }
     .lb-score .rank {
-      color: #888;
-      font-size: 11px;
+      color: var(--color-gray);
+      font-size: var(--text-xs);
     }
     
     .lb-total {
       text-align: center;
-      font-size: 24px;
-      font-weight: 800;
-      color: #e94560;
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-black);
+      color: var(--color-teal);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
     }
     
     .empty {
       text-align: center;
-      padding: 60px;
-      color: #666;
+      padding: var(--space-12);
+      color: var(--color-gray);
+      font-family: var(--font-display);
+      text-transform: uppercase;
     }
     
-    .live-badge {
-      display: inline-block;
-      background: #e94560;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-left: 10px;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-    
-    .fullscreen-btn {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 100;
-    }
-    .fullscreen-btn:hover {
-      background: rgba(255,255,255,0.2);
+    @media (max-width: 768px) {
+      .lb-header, .lb-row {
+        grid-template-columns: 50px 1fr 80px;
+      }
+      .lb-header > div:not(:first-child):not(:nth-child(2)):not(:last-child),
+      .lb-row > div:not(:first-child):not(:nth-child(2)):not(:last-child) {
+        display: none;
+      }
+      .header h1 {
+        font-size: var(--text-2xl);
+      }
     }
   </style>
 </head>
 <body>
-  <a href="../" style="position:fixed;top:15px;left:15px;color:#888;text-decoration:none;font-size:14px;z-index:100;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:8px;">← Home</a>
+  <a href="../" class="back-btn">← Home</a>
   <button class="fullscreen-btn" onclick="toggleFullscreen()" aria-label="Toggle fullscreen">⛶</button>
   
   <div class="header">
-    <h1 id="compTitle">🏆 ARK Games <span class="live-badge">LIVE</span></h1>
+    <h1 id="compTitle">🏆 <span>ARK</span> GAMES <span class="live-indicator">LIVE</span></h1>
     <p id="compDate"></p>
   </div>
   
@@ -188,32 +247,30 @@
   
   <div class="content">
     <div class="leaderboard" id="leaderboard">
-      <div class="empty">Caricamento...</div>
+      <div class="empty">
+        <div class="loading-spinner" style="margin: 0 auto var(--space-4);"></div>
+        Caricamento...
+      </div>
     </div>
   </div>
 
   <script type="module">
     import { DB } from '../firebase-config.js';
     
-    // Get compId or seasonId from URL param
     const urlParams = new URLSearchParams(location.search);
     const compId = urlParams.get('c') || localStorage.getItem('ark2_compId');
     const seasonId = urlParams.get('s') || localStorage.getItem('ark2_seasonId');
     
-    // Determine mode: competition or season
     const isSeasonMode = !!seasonId && !compId;
     const eventId = isSeasonMode ? seasonId : compId;
     const basePath = isSeasonMode ? `seasons/${seasonId}` : `competitions/${compId}`;
     
-    // Sync to localStorage
     if (compId) localStorage.setItem('ark2_compId', compId);
     if (seasonId) localStorage.setItem('ark2_seasonId', seasonId);
     
     if (!eventId) {
       location.href = 'index.html';
     }
-    
-    console.log(`Leaderboard mode: ${isSeasonMode ? 'SEASON' : 'COMPETITION'}`);
     
     let competition = null;
     let categories = [];
@@ -238,7 +295,7 @@
         return;
       }
       
-      document.getElementById('compTitle').innerHTML = `🏆 ${competition.name || 'ARK Games'} <span class="live-badge">LIVE</span>`;
+      document.getElementById('compTitle').innerHTML = `🏆 <span>${competition.name || 'ARK GAMES'}</span> <span class="live-indicator">LIVE</span>`;
       document.getElementById('compDate').textContent = competition.date || '';
       
       categories = competition.categories || ['Experience', 'Scaled', 'Open'];
@@ -246,8 +303,6 @@
       
       renderTabs();
       loadData();
-      
-      // Auto-rotate categories (with manual override protection)
       startAutoRotate();
     }
     
@@ -261,13 +316,12 @@
         currentCategory = categories[(idx + 1) % categories.length];
         updateActivTab();
         renderLeaderboard();
-      }, 30000); // 30s for comfortable viewing
+      }, 30000);
     }
     
     function pauseAutoRotate() {
       if (autoRotateInterval) clearInterval(autoRotateInterval);
       if (autoRotateTimeout) clearTimeout(autoRotateTimeout);
-      // Resume auto-rotate after 60s of inactivity
       autoRotateTimeout = setTimeout(startAutoRotate, 60000);
     }
     
@@ -285,7 +339,7 @@
     }
     
     window.selectCategory = (cat) => {
-      pauseAutoRotate(); // Stop auto-rotate on manual selection
+      pauseAutoRotate();
       currentCategory = cat;
       updateActivTab();
       renderLeaderboard();
@@ -298,7 +352,6 @@
       
       renderLeaderboard();
       
-      // Listen for score updates
       DB.listen(`${basePath}/scores`, (newScores) => {
         scores = newScores || {};
         renderLeaderboard();
@@ -308,7 +361,6 @@
     function renderLeaderboard() {
       const lb = document.getElementById('leaderboard');
       
-      // Get teams in current category
       const catTeams = Object.entries(teams)
         .filter(([id, t]) => t.category === currentCategory)
         .map(([id, t]) => ({ id, ...t }));
@@ -318,7 +370,6 @@
         return;
       }
       
-      // Get workouts for this category
       const catWorkouts = Object.entries(workouts)
         .filter(([id, w]) => !w.categories || w.categories.includes(currentCategory))
         .map(([id, w]) => ({ id, ...w }));
@@ -326,7 +377,6 @@
       const wodCount = catWorkouts.length;
       lb.style.setProperty('--wod-count', wodCount);
       
-      // Calculate rankings for each WOD
       const wodRankings = {};
       catWorkouts.forEach(wod => {
         const wodScores = catTeams.map(team => {
@@ -340,7 +390,6 @@
           };
         }).filter(s => s.hasScore);
         
-        // Sort: For Time = lower time better, AMRAP = higher reps better
         if (wod.type === 'fortime') {
           wodScores.sort((a, b) => {
             if (a.time && b.time) return a.time - b.time;
@@ -352,7 +401,6 @@
           wodScores.sort((a, b) => (b.reps || 0) - (a.reps || 0));
         }
         
-        // Assign ranks
         wodRankings[wod.id] = {};
         wodScores.forEach((s, i) => {
           wodRankings[wod.id][s.teamId] = {
@@ -363,7 +411,6 @@
         });
       });
       
-      // Calculate total points
       const teamPoints = catTeams.map(team => {
         let total = 0;
         catWorkouts.forEach(wod => {
@@ -371,17 +418,14 @@
           if (ranking) {
             total += ranking.rank;
           } else {
-            // No score = last place points
             total += catTeams.length;
           }
         });
         return { ...team, total };
       });
       
-      // Sort by total points (lower is better)
       teamPoints.sort((a, b) => a.total - b.total);
       
-      // Render
       lb.innerHTML = `
         <div class="lb-header">
           <div>#</div>
