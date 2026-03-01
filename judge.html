@@ -3,379 +3,269 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>📋 Giudice - ARK Games 2.0</title>
+  <title>📋 Giudice - ARK Games 3.0</title>
+  <link rel="stylesheet" href="assets/css/design-system.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="stylesheet" href="assets/css/judge.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Additional judge-specific overrides */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f0f1a;
-      color: #fff;
-      min-height: 100vh;
+      background: linear-gradient(135deg, var(--color-black), var(--color-charcoal));
     }
     
-    .screen {
-      display: none;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .screen.active {
+    /* PIN dots */
+    .pin-dots {
       display: flex;
-      flex-direction: column;
-    }
-    
-    .header {
-      text-align: center;
-      padding: 20px 0;
-    }
-    .header h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-    .header p {
-      color: #888;
-      font-size: 14px;
-    }
-    
-    .step-indicator {
-      display: flex;
+      gap: var(--space-3);
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
+      margin-bottom: var(--space-6);
     }
-    .step {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+    .pin-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: var(--border-radius-full);
+      border: 2px solid var(--color-dark-gray);
+      background: transparent;
+      transition: var(--transition-base);
     }
-    .step.active {
-      background: #e94560;
-    }
-    .step.done {
-      background: #2ecc71;
+    .pin-dot.filled {
+      background: var(--color-rust);
+      border-color: var(--color-rust);
+      box-shadow: var(--glow-rust);
     }
     
-    .card-list {
-      flex: 1;
-      overflow-y: auto;
+    /* PIN keypad */
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      max-width: 260px;
+      margin: 0 auto;
     }
-    
-    .select-card {
-      background: #1a1a2e;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 12px;
+    .pin-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--border-radius-full);
+      border: 2px solid var(--color-dark-gray);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-white);
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-bold);
       cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 15px;
+      transition: var(--transition-base);
     }
-    .select-card:hover {
-      background: #252542;
+    .pin-btn:hover {
+      border-color: var(--color-rust);
+      background: rgba(233, 69, 96, 0.1);
     }
-    .select-card.selected {
-      background: #e94560;
+    .pin-btn:active {
+      transform: scale(0.95);
     }
-    .select-card .emoji {
-      font-size: 36px;
-    }
-    .select-card .info h3 {
-      font-size: 18px;
-      margin-bottom: 4px;
-    }
-    .select-card .info p {
-      color: rgba(255,255,255,0.6);
-      font-size: 13px;
-    }
-    .select-card.selected .info p {
-      color: rgba(255,255,255,0.8);
+    .pin-btn.confirm {
+      background: var(--color-success);
+      border-color: var(--color-success);
     }
     
-    .btn {
-      padding: 18px;
-      border-radius: 14px;
-      border: none;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 20px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #e94560, #ff6b6b);
-      color: #fff;
-    }
-    .btn-secondary {
-      background: #333;
-      color: #fff;
-    }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    
-    /* Timer Screen */
-    .timer-screen {
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-    }
-    .timer-display {
-      font-size: 100px;
-      font-weight: 800;
-      font-family: 'SF Mono', Monaco, monospace;
-      margin: 30px 0;
-    }
-    .timer-status {
-      font-size: 24px;
-      color: #888;
-      margin-bottom: 30px;
-    }
-    .timer-status.countdown {
-      color: #f1c40f;
-      font-size: 80px;
-    }
-    .timer-status.running {
-      color: #2ecc71;
-    }
-    
-    .team-badge {
-      background: #1a1a2e;
-      border-radius: 20px;
-      padding: 15px 30px;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .team-badge .emoji {
-      font-size: 40px;
-    }
-    
-    .movements-list {
-      background: #1a1a2e;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: left;
-      margin: 20px 0;
-      max-width: 400px;
-    }
-    .movements-list h4 {
-      color: #888;
-      font-size: 12px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .movement-item {
-      padding: 8px 0;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-    }
-    .movement-item:last-child {
-      border-bottom: none;
-    }
-    
-    /* Score Input */
-    .score-input-container {
-      background: #1a1a2e;
-      border-radius: 20px;
-      padding: 30px;
-      margin: 20px 0;
-    }
-    .score-input-container h3 {
-      margin-bottom: 20px;
-    }
-    .score-row {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    .score-row label {
-      flex: 1;
-      text-align: left;
-    }
-    .score-row label span {
-      display: block;
-      color: #888;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-    .score-row input {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: 2px solid #333;
-      background: #0f0f1a;
-      color: #fff;
-      font-size: 24px;
-      text-align: center;
-    }
-    .score-row input:focus {
-      outline: none;
-      border-color: #e94560;
-    }
-    
+    /* Waiting overlay */
     .waiting-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.9);
+      background: rgba(10, 10, 18, 0.95);
+      backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: var(--z-modal);
     }
-    .waiting-overlay.hidden {
-      display: none;
-    }
-    .waiting-spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid #333;
-      border-top-color: #e94560;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    .waiting-overlay.hidden { display: none; }
     
+    /* Ready button */
     .ready-btn {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      padding: 20px;
-      border-radius: 16px;
+      bottom: var(--space-6);
+      left: var(--space-6);
+      right: var(--space-6);
+      padding: var(--space-6);
+      border-radius: var(--border-radius-lg);
       border: none;
-      font-size: 20px;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
       cursor: pointer;
-      background: #2ecc71;
-      color: #fff;
+      background: var(--color-success);
+      color: white;
+      transition: var(--transition-base);
     }
     .ready-btn.not-ready {
-      background: #e94560;
+      background: var(--color-danger);
     }
     
-    .empty {
-      text-align: center;
-      padding: 40px;
-      color: #666;
-    }
-    
-    /* Rep Counter */
-    .timer-top { text-align: center; padding: 10px; }
+    /* Rep counter */
+    .timer-top { text-align: center; padding: var(--space-4); }
     .rep-area {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: var(--space-4);
     }
     .rep-count {
-      font-size: 120px;
-      font-weight: 800;
+      font-family: var(--font-display);
+      font-size: 8rem;
+      font-weight: var(--weight-black);
       line-height: 1;
-      color: #2ecc71;
+      color: var(--color-success);
+      text-shadow: 0 0 40px rgba(46, 204, 113, 0.5);
+      transition: transform 0.1s;
     }
     .rep-label {
-      color: #888;
-      font-size: 16px;
-      margin-top: 8px;
+      color: var(--color-gray);
+      font-size: var(--text-base);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
+      margin-top: var(--space-2);
     }
     .movement-current {
-      color: #e94560;
-      font-size: 18px;
-      margin-top: 16px;
+      color: var(--color-rust);
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      text-transform: uppercase;
+      margin-top: var(--space-4);
       text-align: center;
-      font-weight: 600;
     }
+    
+    /* Movements track */
     .movements-track {
-      max-height: 150px;
+      max-height: 160px;
       overflow-y: auto;
-      margin: 0 16px;
-      padding: 8px;
-      background: #111;
-      border-radius: 8px;
-      font-size: 14px;
+      margin: 0 var(--space-4);
+      padding: var(--space-3);
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: var(--border-radius-lg);
     }
-    .movement-item {
-      padding: 8px 12px;
-      margin: 4px 0;
-      border-radius: 6px;
+    .movements-track .movement-item {
+      padding: var(--space-3) var(--space-4);
+      margin: var(--space-2) 0;
+      border-radius: var(--border-radius-md);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.3s;
+      transition: var(--transition-base);
+      border: none;
     }
-    .movement-item.done { background: #2ecc7133; color: #2ecc71; text-decoration: line-through; }
-    .movement-item.active { background: #e9456044; color: #e94560; font-weight: bold; transform: scale(1.02); }
-    .movement-item.pending { background: #1a1a1a; color: #666; }
-    .movement-item .reps { font-weight: bold; min-width: 50px; text-align: right; }
+    .movements-track .movement-item.done {
+      background: rgba(46, 204, 113, 0.2);
+      color: var(--color-success);
+      text-decoration: line-through;
+    }
+    .movements-track .movement-item.active {
+      background: rgba(233, 69, 96, 0.3);
+      color: var(--color-rust);
+      font-weight: var(--weight-bold);
+      transform: scale(1.02);
+    }
+    .movements-track .movement-item.pending {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-gray);
+    }
     
+    /* Rep buttons */
     .rep-buttons {
       display: flex;
-      gap: 10px;
-      padding: 16px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      gap: var(--space-3);
+      padding: var(--space-4);
+      padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
     }
     .rep-btn {
       flex: 1;
-      padding: 24px 16px;
+      padding: var(--space-6) var(--space-4);
       border: none;
-      border-radius: 16px;
-      font-size: 24px;
-      font-weight: 700;
+      border-radius: var(--border-radius-lg);
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       touch-action: manipulation;
+      transition: transform 0.1s;
     }
     .rep-btn:active { transform: scale(0.95); }
-    .btn-rep { background: #2ecc71; color: #fff; flex: 3; }
-    .btn-norep { background: #c0392b; color: #fff; flex: 1; }
-    .btn-undo { background: #333; color: #888; flex: 1; }
+    .btn-rep {
+      background: linear-gradient(135deg, var(--color-success), #27ae60);
+      color: white;
+      flex: 3;
+      box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
+    }
+    .btn-norep {
+      background: var(--color-danger);
+      color: white;
+      flex: 1;
+    }
+    .btn-undo {
+      background: var(--color-dark-gray);
+      color: var(--color-gray);
+      flex: 1;
+    }
     
-    /* PIN Login */
-    .pin-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 2px solid #444;
-      background: transparent;
-      transition: all 0.2s;
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: var(--space-10);
+      color: var(--color-gray);
     }
-    .pin-dot.filled {
-      background: #e94560;
-      border-color: #e94560;
+    
+    /* Category header */
+    .category-header {
+      padding: var(--space-4) 0 var(--space-2);
+      color: var(--color-gray);
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
     }
-    .pin-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: #333;
-      color: #fff;
-      font-size: 24px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
+    
+    /* Login box styling */
+    .login-box {
+      background: var(--color-charcoal);
+      border-radius: var(--border-radius-xl);
+      padding: var(--space-8);
+      width: 100%;
+      max-width: 340px;
+      box-shadow: var(--shadow-2xl);
     }
-    .pin-btn:hover {
-      background: #444;
+    
+    .name-input {
+      width: 100%;
+      padding: var(--space-4);
+      border-radius: var(--border-radius-lg);
+      border: 2px solid var(--color-dark-gray);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--color-white);
+      font-size: var(--text-base);
+      text-align: center;
+      margin-bottom: var(--space-5);
+      transition: var(--transition-base);
     }
-    .pin-btn:active {
-      transform: scale(0.95);
+    .name-input:focus {
+      outline: none;
+      border-color: var(--color-rust);
+    }
+    .name-input::placeholder {
+      color: var(--color-gray);
+    }
+    
+    @media (max-width: 480px) {
+      .rep-count { font-size: 6rem; }
+      .timer-display { font-size: 4rem !important; }
     }
   </style>
 </head>
@@ -383,24 +273,23 @@
 
   <!-- SCREEN 0: PIN Login -->
   <div class="screen active" id="screen-login">
-    <div class="header">
+    <div class="judge-header">
       <h1>🔐 Accesso Giudice</h1>
       <p>Inserisci il PIN fornito dall'organizzatore</p>
     </div>
     
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div style="background:#1a1a2e;border-radius:20px;padding:30px;width:100%;max-width:300px">
-        <input type="text" id="judgeName" placeholder="👤 Il tuo nome" 
-          style="width:100%;padding:15px;border-radius:12px;border:2px solid #333;background:#0f0f1a;color:#fff;font-size:16px;margin-bottom:15px;text-align:center">
+      <div class="login-box">
+        <input type="text" id="judgeName" class="name-input" placeholder="👤 Il tuo nome" autocomplete="off">
         
-        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px" id="pinDisplay">
+        <div class="pin-dots" id="pinDisplay">
           <div class="pin-dot"></div>
           <div class="pin-dot"></div>
           <div class="pin-dot"></div>
           <div class="pin-dot"></div>
         </div>
         
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto">
+        <div class="pin-grid">
           <button class="pin-btn" onclick="enterPin('1')">1</button>
           <button class="pin-btn" onclick="enterPin('2')">2</button>
           <button class="pin-btn" onclick="enterPin('3')">3</button>
@@ -412,10 +301,10 @@
           <button class="pin-btn" onclick="enterPin('9')">9</button>
           <button class="pin-btn" onclick="clearPin()">⌫</button>
           <button class="pin-btn" onclick="enterPin('0')">0</button>
-          <button class="pin-btn" onclick="submitPin()" style="background:#2ecc71">✓</button>
+          <button class="pin-btn confirm" onclick="submitPin()">✓</button>
         </div>
         
-        <p id="pinError" style="color:#e94560;text-align:center;margin-top:15px;font-size:13px;display:none">
+        <p id="pinError" style="color:var(--color-danger);text-align:center;margin-top:var(--space-4);font-size:var(--text-sm);display:none">
           PIN errato. Riprova.
         </p>
       </div>
@@ -423,8 +312,8 @@
   </div>
 
   <!-- SCREEN 1: Select WOD -->
-  <div class="screen active" id="screen-wod">
-    <div class="header">
+  <div class="screen" id="screen-wod">
+    <div class="judge-header">
       <h1>📋 Giudice</h1>
       <p>Seleziona il WOD da giudicare</p>
     </div>
@@ -436,13 +325,16 @@
     </div>
     
     <div class="card-list" id="wodList">
-      <div class="empty">Caricamento...</div>
+      <div class="empty">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: var(--space-4)">Caricamento...</p>
+      </div>
     </div>
   </div>
   
   <!-- SCREEN 2: Select Team -->
   <div class="screen" id="screen-team">
-    <div class="header">
+    <div class="judge-header">
       <h1 id="selectedWodName">WOD</h1>
       <p>Seleziona il team da giudicare</p>
     </div>
@@ -457,12 +349,12 @@
       <div class="empty">Caricamento...</div>
     </div>
     
-    <button class="btn btn-secondary" onclick="goToScreen('screen-wod')">← Indietro</button>
+    <button class="btn-judge secondary" onclick="goToScreen('screen-wod')">← Indietro</button>
   </div>
   
   <!-- SCREEN 3: Confirm & Ready -->
   <div class="screen" id="screen-ready">
-    <div class="header">
+    <div class="judge-header">
       <h1>✅ Conferma Presenza</h1>
       <p>Il team è in posizione?</p>
     </div>
@@ -476,17 +368,17 @@
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
       <div class="team-badge">
         <span class="emoji" id="confirmEmoji">🐾</span>
-        <span id="confirmTeamName">Team</span>
+        <span class="name" id="confirmTeamName">Team</span>
       </div>
       
       <div class="movements-list" id="movementsList">
         <h4>Movimenti</h4>
       </div>
       
-      <button class="btn btn-primary" onclick="confirmPresence()" id="confirmBtn">
+      <button class="btn-judge primary" onclick="confirmPresence()" id="confirmBtn">
         ✅ Team Presente - PRONTO
       </button>
-      <button class="btn btn-secondary" onclick="goToScreen('screen-team')" style="margin-top:10px">
+      <button class="btn-judge secondary" onclick="goToScreen('screen-team')" style="margin-top:var(--space-3)">
         ← Cambia Team
       </button>
     </div>
@@ -495,9 +387,9 @@
   <!-- SCREEN 4: Waiting for Start -->
   <div class="screen" id="screen-waiting">
     <div class="waiting-overlay" id="waitingOverlay">
-      <div class="waiting-spinner"></div>
-      <h2>In attesa dello START...</h2>
-      <p style="color:#888;margin-top:10px" id="waitingStatus">0/0 giudici pronti</p>
+      <div class="loading-spinner"></div>
+      <h2 style="font-family:var(--font-display);text-transform:uppercase;margin-top:var(--space-6)">In attesa dello START...</h2>
+      <p style="color:var(--color-gray);margin-top:var(--space-3)" id="waitingStatus">0/0 giudici pronti</p>
     </div>
     
     <button class="ready-btn" id="readyToggle" onclick="toggleReady()">
@@ -510,7 +402,7 @@
     <div class="timer-top">
       <div class="team-badge">
         <span class="emoji" id="timerEmoji">🐾</span>
-        <span id="timerTeamName">Team</span>
+        <span class="name" id="timerTeamName">Team</span>
       </div>
       <div class="timer-status" id="timerStatus">In corso</div>
       <div class="timer-display" id="timerDisplay">00:00</div>
@@ -527,30 +419,33 @@
     <div class="rep-buttons">
       <button class="rep-btn btn-undo" onclick="undoRep()">↩️</button>
       <button class="rep-btn btn-rep" onclick="addRep()">+1 REP</button>
-      <button class="rep-btn btn-norep" onclick="noRep()">NO REP</button>
+      <button class="rep-btn btn-norep" onclick="noRep()">✕</button>
     </div>
   </div>
   
   <!-- SCREEN 6: Score Input -->
   <div class="screen" id="screen-score">
-    <div class="header">
+    <div class="judge-header">
       <h1>📝 Inserisci Score</h1>
     </div>
     
-    <div class="team-badge">
-      <span class="emoji" id="scoreEmoji">🐾</span>
-      <span id="scoreTeamName">Team</span>
-    </div>
-    
-    <div class="score-input-container">
-      <div class="score-row" id="scoreFields">
-        <!-- Dynamic based on WOD type -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+      <div class="team-badge">
+        <span class="emoji" id="scoreEmoji">🐾</span>
+        <span class="name" id="scoreTeamName">Team</span>
       </div>
+      
+      <div class="score-input-container">
+        <h3 style="text-align:center">Risultato Finale</h3>
+        <div id="scoreFields">
+          <!-- Dynamic based on WOD type -->
+        </div>
+      </div>
+      
+      <button class="btn-judge primary" onclick="submitScore()">
+        ✅ Conferma Score
+      </button>
     </div>
-    
-    <button class="btn btn-primary" onclick="submitScore()">
-      ✅ Conferma Score
-    </button>
   </div>
 
   <script type="module">
@@ -560,14 +455,12 @@
     const urlParams = new URLSearchParams(location.search);
     const compId = urlParams.get('c') || localStorage.getItem('ark2_compId');
     const seasonId = urlParams.get('s') || localStorage.getItem('ark2_seasonId');
-    const seasonDate = urlParams.get('date'); // For season mode: which day
+    const seasonDate = urlParams.get('date');
     
-    // Determine mode: competition or season
     const isSeasonMode = !!seasonId && !compId;
     const eventId = isSeasonMode ? seasonId : compId;
     const basePath = isSeasonMode ? `seasons/${seasonId}` : `competitions/${compId}`;
     
-    // Sync to localStorage
     if (compId) localStorage.setItem('ark2_compId', compId);
     if (seasonId) localStorage.setItem('ark2_seasonId', seasonId);
     
@@ -576,9 +469,8 @@
       location.href = 'index.html';
     }
     
-    // Season mode state
-    let currentSeasonEvent = null; // { date, wodId, status }
-    let todayDate = seasonDate || new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    let currentSeasonEvent = null;
+    let todayDate = seasonDate || new Date().toISOString().split('T')[0];
     
     console.log(`Judge mode: ${isSeasonMode ? 'SEASON' : 'COMPETITION'}, ID: ${eventId}${isSeasonMode ? ', Date: ' + todayDate : ''}`);
     
@@ -591,23 +483,20 @@
     let isReady = false;
     let timerInterval = null;
     let currentPin = '';
-    let correctPin = '1234'; // Default PIN, loaded from Firebase
+    let correctPin = '1234';
     
-    // Rep counter state
     let reps = 0;
     let noReps = 0;
     let movements = [];
     let currentMovementIndex = 0;
     let totalTargetReps = 0;
     
-    // Load PIN from competition config
     async function loadJudgeConfig() {
       const config = await DB.get(`${basePath}/judgeConfig`);
       if (config?.pin) {
         correctPin = config.pin;
       }
       
-      // Check if already logged in
       const savedAuth = localStorage.getItem('ark2_judgeAuth');
       if (savedAuth) {
         const auth = JSON.parse(savedAuth);
@@ -621,7 +510,6 @@
       }
     }
     
-    // PIN entry functions
     window.enterPin = (digit) => {
       if (currentPin.length < 4) {
         currentPin += digit;
@@ -658,7 +546,6 @@
         return;
       }
       
-      // Success! Create judge ID and save auth
       judgeId = 'judge_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
       judgeName = name;
       
@@ -666,20 +553,18 @@
         compId,
         judgeId,
         name,
-        expiry: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+        expiry: Date.now() + (24 * 60 * 60 * 1000)
       }));
       
       goToScreen('screen-wod');
       loadWods();
     };
     
-    // Screen navigation
     window.goToScreen = (screenId) => {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     };
     
-    // Load WODs - filtered for season mode
     async function loadWods() {
       const list = document.getElementById('wodList');
       let wods = await DB.get(`${basePath}/workouts`);
@@ -689,37 +574,33 @@
         return;
       }
       
-      // SEASON MODE: Check for currentEvent and filter to today's WOD only
       if (isSeasonMode) {
         currentSeasonEvent = await DB.get(`${basePath}/currentEvent`);
         
         if (currentSeasonEvent && currentSeasonEvent.status === 'active') {
-          // Show only the WOD for today's event
           const activeWodId = currentSeasonEvent.wodId;
           const eventDate = currentSeasonEvent.date;
-          todayDate = eventDate; // Update to event date
+          todayDate = eventDate;
           
           if (wods[activeWodId]) {
             wods = { [activeWodId]: wods[activeWodId] };
-            document.querySelector('#screen-wod .header p').textContent = 
+            document.querySelector('#screen-wod .judge-header p').textContent = 
               `Evento del ${eventDate} - Seleziona per giudicare`;
           } else {
             list.innerHTML = '<div class="empty">WOD dell\'evento non trovato</div>';
             return;
           }
         } else {
-          // No active event - check schedule for today
           const schedule = await DB.get(`${basePath}/schedule/${todayDate}`);
           
           if (schedule && schedule.wodId) {
             if (wods[schedule.wodId]) {
               wods = { [schedule.wodId]: wods[schedule.wodId] };
-              document.querySelector('#screen-wod .header p').textContent = 
+              document.querySelector('#screen-wod .judge-header p').textContent = 
                 `WOD del ${todayDate} - In attesa che l'admin apra l'evento`;
             }
           } else {
-            // Show all WODs with info that no event is active
-            document.querySelector('#screen-wod .header p').textContent = 
+            document.querySelector('#screen-wod .judge-header p').textContent = 
               '⚠️ Nessun evento attivo - Mostrando tutti i WOD';
           }
         }
@@ -736,7 +617,6 @@
       `).join('');
     }
     
-    // Select WOD
     window.selectWod = async (wodId, wodName) => {
       selectedWod = { id: wodId, ...(await DB.get(`${basePath}/workouts/${wodId}`)) };
       document.getElementById('selectedWodName').textContent = wodName;
@@ -744,29 +624,23 @@
       loadTeams();
     };
     
-    // Generate score key - includes date for season mode
     function getScoreKey(teamId, wodId) {
       if (isSeasonMode) {
-        // Season scores include date to allow same team/wod on different recovery dates
         return `${teamId}_${wodId}_${todayDate}`;
       }
       return `${teamId}_${wodId}`;
     }
     
-    // Load teams (only those without score for this WOD)
     async function loadTeams() {
       allTeams = await DB.get(`${basePath}/teams`) || {};
       allScores = await DB.get(`${basePath}/scores`) || {};
       
       const list = document.getElementById('teamList');
       
-      // Filter teams: only those in WOD categories and without score
       const availableTeams = Object.entries(allTeams).filter(([id, t]) => {
-        // Check category
         if (selectedWod.categories && !selectedWod.categories.includes(t.category)) {
           return false;
         }
-        // Check if already has score for this WOD (and date in season mode)
         const scoreKey = getScoreKey(id, selectedWod.id);
         if (allScores[scoreKey]) {
           return false;
@@ -779,7 +653,6 @@
         return;
       }
       
-      // Group by category
       const grouped = {};
       availableTeams.forEach(([id, t]) => {
         if (!grouped[t.category]) grouped[t.category] = [];
@@ -787,7 +660,7 @@
       });
       
       list.innerHTML = Object.entries(grouped).map(([cat, teams]) => `
-        <h4 style="padding:10px 0;color:#888">${cat}</h4>
+        <div class="category-header">${cat}</div>
         ${teams.map(t => `
           <div class="select-card" onclick="selectTeam('${t.id}')">
             <div class="emoji">${t.emoji}</div>
@@ -799,21 +672,19 @@
       `).join('');
     }
     
-    // Select team
     window.selectTeam = (teamId) => {
       selectedTeam = { id: teamId, ...allTeams[teamId] };
       
       document.getElementById('confirmEmoji').textContent = selectedTeam.emoji;
       document.getElementById('confirmTeamName').textContent = selectedTeam.name;
       
-      // Show movements
       const movList = document.getElementById('movementsList');
       movList.innerHTML = `
         <h4>Movimenti - ${selectedWod.name}</h4>
         ${(selectedWod.movements || []).map(m => `
           <div class="movement-item">
-            <span>${m.name}</span>
-            <span style="color:#888">${m.reps}</span>
+            <span class="name">${m.name}</span>
+            <span class="reps">${m.reps}</span>
           </div>
         `).join('')}
       `;
@@ -821,9 +692,7 @@
       goToScreen('screen-ready');
     };
     
-    // Confirm presence and mark ready
     window.confirmPresence = async () => {
-      // Register as judge
       await DB.set(`${basePath}/judges/${judgeId}`, {
         name: 'Giudice ' + judgeId.substr(-4),
         wodId: selectedWod.id,
@@ -840,7 +709,6 @@
       listenForStart();
     };
     
-    // Toggle ready status
     window.toggleReady = async () => {
       isReady = !isReady;
       const btn = document.getElementById('readyToggle');
@@ -856,9 +724,7 @@
       }
     };
     
-    // Listen for heat start (or currentEvent in season mode)
     function listenForStart() {
-      // Listen for judge count
       DB.listen(`${basePath}/judges`, (judges) => {
         if (!judges) return;
         const total = Object.keys(judges).length;
@@ -867,7 +733,6 @@
       });
       
       if (isSeasonMode) {
-        // SEASON MODE: Listen for currentEvent changes
         DB.listen(`${basePath}/currentEvent`, (event) => {
           if (!event) return;
           currentSeasonEvent = event;
@@ -881,7 +746,6 @@
           }
         });
       } else {
-        // COMPETITION MODE: Listen for currentHeat
         DB.listen(`${basePath}/currentHeat`, (heat) => {
           if (heat && heat.status === 'countdown') {
             startCountdown(heat.countdownFrom || 10);
@@ -894,7 +758,6 @@
       }
     }
     
-    // Voice synthesis helper
     function speak(text) {
       if ('speechSynthesis' in window) {
         const utter = new SpeechSynthesisUtterance(text);
@@ -904,7 +767,6 @@
       }
     }
     
-    // Beep sound
     function beep(freq = 800, duration = 200) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -920,7 +782,6 @@
       } catch(e) {}
     }
     
-    // Countdown before start
     function startCountdown(seconds) {
       document.getElementById('waitingOverlay').classList.add('hidden');
       goToScreen('screen-timer');
@@ -933,14 +794,12 @@
       document.getElementById('timerDisplay').textContent = count;
       document.getElementById('timerStatus').textContent = 'PRONTI!';
       
-      // Initial voice
       speak('Pronti!');
       
       const interval = setInterval(() => {
         count--;
         if (count > 0) {
           document.getElementById('timerDisplay').textContent = count;
-          // Voice countdown for last 5 seconds
           if (count <= 5) {
             speak(count.toString());
             beep(600 + (5 - count) * 100, 150);
@@ -957,12 +816,10 @@
       }, 1000);
     }
     
-    // Timer running
     function startTimer(timeCapSec, startedAt) {
       document.getElementById('timerStatus').className = 'timer-status running';
       document.getElementById('timerStatus').textContent = 'In corso';
       
-      // Initialize rep counter
       reps = 0;
       noReps = 0;
       currentMovementIndex = 0;
@@ -974,7 +831,6 @@
         ? `REPS (su ${totalTargetReps})` 
         : 'REPS';
       
-      // Render movements list with tracking
       updateMovementsList();
       updateCurrentMovement();
       
@@ -999,7 +855,6 @@
       }, 100);
     }
     
-    // Update movements list UI
     function updateMovementsList() {
       let cumulativeReps = 0;
       document.getElementById('timerMovements').innerHTML = movements.map((m, i) => {
@@ -1018,7 +873,6 @@
       }).join('');
     }
     
-    // Update current movement indicator
     function updateCurrentMovement() {
       let cumulativeReps = 0;
       for (let i = 0; i < movements.length; i++) {
@@ -1030,11 +884,9 @@
           return;
         }
       }
-      // All done
       document.getElementById('currentMovement').textContent = '🎉 COMPLETATO!';
     }
     
-    // Add rep
     window.addRep = async () => {
       reps++;
       document.getElementById('repCount').textContent = reps;
@@ -1044,14 +896,12 @@
       updateMovementsList();
       updateCurrentMovement();
       
-      // Sync to Firebase
       await DB.update(`${basePath}/judges/${judgeId}`, {
         reps: reps,
         noReps: noReps,
         lastUpdate: Date.now()
       });
       
-      // Auto-submit for For Time if target reached
       if (totalTargetReps > 0 && reps >= totalTargetReps) {
         speak('Completo!');
         beep(1000, 300);
@@ -1059,7 +909,6 @@
       }
     };
     
-    // No rep
     window.noRep = async () => {
       noReps++;
       beep(300, 150);
@@ -1071,7 +920,6 @@
       });
     };
     
-    // Undo rep
     window.undoRep = async () => {
       if (reps > 0) {
         reps--;
@@ -1086,7 +934,6 @@
       }
     };
     
-    // Show score input
     function showScoreInput() {
       if (timerInterval) clearInterval(timerInterval);
       goToScreen('screen-score');
@@ -1098,53 +945,59 @@
       
       if ((selectedWod.type || 'fortime') === 'fortime') {
         fields.innerHTML = `
-          <label>
-            <span>Tempo (MM:SS) - se completato</span>
-            <input type="text" id="scoreTime" placeholder="05:30" pattern="[0-9]{2}:[0-9]{2}">
-          </label>
-          <label>
-            <span>Reps totali (pre-compilato)</span>
-            <input type="number" id="scoreReps" value="${reps}" placeholder="150">
-          </label>
-          <p style="color:#888;font-size:12px;margin-top:10px">No Reps: ${noReps}</p>
+          <div class="score-row">
+            <label>Tempo (MM:SS) - se completato</label>
+            <div class="time-inputs">
+              <input type="tel" id="scoreMin" placeholder="05" maxlength="2" style="width:70px">
+              <span>:</span>
+              <input type="tel" id="scoreSec" placeholder="30" maxlength="2" style="width:70px">
+            </div>
+          </div>
+          <div class="score-row">
+            <label>Reps totali</label>
+            <input type="number" id="scoreReps" value="${reps}" style="width:120px">
+          </div>
+          <p style="color:var(--color-gray);font-size:var(--text-sm);margin-top:var(--space-4);text-align:center">
+            No Reps registrati: ${noReps}
+          </p>
         `;
       } else {
         fields.innerHTML = `
-          <label>
-            <span>Reps / Rounds (pre-compilato)</span>
-            <input type="number" id="scoreReps" value="${reps}" placeholder="150">
-          </label>
-          <p style="color:#888;font-size:12px;margin-top:10px">No Reps: ${noReps}</p>
+          <div class="score-row">
+            <label>Reps / Rounds totali</label>
+            <input type="number" id="scoreReps" value="${reps}" style="width:120px">
+          </div>
+          <p style="color:var(--color-gray);font-size:var(--text-sm);margin-top:var(--space-4);text-align:center">
+            No Reps registrati: ${noReps}
+          </p>
         `;
       }
-      
-      goToScreen('screen-score');
     }
     
-    // Submit score
     window.submitScore = async () => {
-      const timeInput = document.getElementById('scoreTime');
+      const minInput = document.getElementById('scoreMin');
+      const secInput = document.getElementById('scoreSec');
       const repsInput = document.getElementById('scoreReps');
       
       let time = null;
-      let reps = null;
+      let finalReps = null;
       
-      if (timeInput && timeInput.value) {
-        const [m, s] = timeInput.value.split(':').map(Number);
+      if (minInput && secInput && (minInput.value || secInput.value)) {
+        const m = parseInt(minInput.value) || 0;
+        const s = parseInt(secInput.value) || 0;
         time = m * 60 + s;
       }
       if (repsInput && repsInput.value) {
-        reps = parseInt(repsInput.value);
+        finalReps = parseInt(repsInput.value);
       }
       
-      if (!time && (reps === null || reps === undefined)) {
+      if (!time && (finalReps === null || finalReps === undefined)) {
         alert('Inserisci un tempo o le reps!');
         return;
       }
       
       const scoreKey = getScoreKey(selectedTeam.id, selectedWod.id);
       
-      // Check if score already exists and is locked
       const config = await DB.get(`${basePath}/judgeConfig`);
       const existingScore = await DB.get(`${basePath}/scores/${scoreKey}`);
       
@@ -1161,27 +1014,23 @@
         teamId: selectedTeam.id,
         wodId: selectedWod.id,
         time,
-        reps,
+        reps: finalReps,
         judgeId,
         judgeName: judgeName || 'Unknown',
         timestamp: Date.now(),
-        // Season mode: include event date for tracking
         ...(isSeasonMode && { eventDate: todayDate })
       });
       
-      // Clear judge status
       await DB.remove(`${basePath}/judges/${judgeId}`);
       
       alert('✅ Score salvato!');
       
-      // Reset and go back to WOD selection
       selectedWod = null;
       selectedTeam = null;
       goToScreen('screen-wod');
       loadWods();
     };
     
-    // Init - Start with PIN login
     loadJudgeConfig();
   </script>
 </body>

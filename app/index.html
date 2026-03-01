@@ -3,386 +3,362 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Gare Disponibili - ARK Games</title>
+  <title>Gare Disponibili - ARK Games 3.0</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      min-height: 100vh;
-      min-height: 100dvh;
-      color: white;
+    /* Hero adjustments for athlete page */
+    .page-hero {
+      min-height: 180px;
     }
     
-    .navbar {
-      background: rgba(0,0,0,0.4);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
+    /* Competition type badges */
+    .type-badge {
+      display: inline-flex;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-    }
-    .navbar a { color: #888; text-decoration: none; font-size: 0.9rem; }
-    .navbar a:hover { color: white; }
-    .navbar .brand { color: #f39c12; font-weight: 700; font-size: 1.1rem; }
-    .navbar .profile-btn {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
+      border-radius: var(--border-radius-full);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--color-gray);
     }
     
-    header {
-      padding: 30px 20px 20px;
-      text-align: center;
+    .type-badge.team {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--color-teal);
     }
-    header h1 { font-size: 1.6rem; margin-bottom: 8px; }
-    header p { color: #888; font-size: 0.95rem; }
     
-    .tabs {
+    .type-badge.individual {
+      background: rgba(243, 156, 18, 0.15);
+      color: var(--color-amber);
+    }
+    
+    /* Profile button */
+    .profile-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius-full);
+      background: linear-gradient(135deg, var(--color-teal), var(--color-teal-dark));
       display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 0 20px 20px;
-    }
-    .tab {
-      padding: 10px 20px;
-      border-radius: 25px;
-      background: rgba(255,255,255,0.05);
+      font-size: 1.2rem;
       border: none;
-      color: #888;
-      font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab.active { background: #f39c12; color: #000; font-weight: 600; }
-    .tab:hover:not(.active) { background: rgba(255,255,255,0.1); }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 20px 100px;
+      transition: var(--transition-base);
     }
     
-    .gara-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 16px;
-      margin-bottom: 15px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .gara-card:hover {
-      border-color: rgba(243, 156, 18, 0.5);
-      transform: translateY(-2px);
+    .profile-btn:hover {
+      transform: scale(1.1);
     }
     
-    .gara-header {
-      padding: 20px;
+    /* Search bar */
+    .search-container {
+      padding: var(--space-4) var(--space-6);
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      padding-left: 44px;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-white);
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius-full);
+      transition: var(--transition-base);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-teal);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .search-wrapper {
+      position: relative;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-gray);
+      pointer-events: none;
+    }
+    
+    /* Card enhancements */
+    .game-card-header {
+      background: linear-gradient(135deg, var(--color-dark-gray), var(--color-charcoal));
+      position: relative;
+    }
+    
+    .game-card-header .card-icon {
+      position: absolute;
+      bottom: -20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--color-rust), var(--color-amber));
+      border-radius: var(--border-radius-lg);
       display: flex;
-      gap: 15px;
       align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-md);
     }
-    .gara-logo {
-      width: 60px; height: 60px;
-      background: linear-gradient(135deg, #f39c12, #e74c3c);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-      flex-shrink: 0;
-    }
-    .gara-info { flex: 1; min-width: 0; }
-    .gara-info h3 {
-      font-size: 1.1rem;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .gara-info .box-name { color: #f39c12; font-size: 0.85rem; margin-bottom: 4px; }
-    .gara-info .date { color: #888; font-size: 0.85rem; }
     
-    .gara-badge {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      white-space: nowrap;
+    .game-card-body {
+      padding-top: var(--space-8);
     }
-    .badge-open { background: #27ae60; color: white; }
-    .badge-live { background: #e74c3c; color: white; animation: pulse 1.5s infinite; }
-    .gara-card.live {
-      border-color: #e74c3c;
-      background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(26, 26, 46, 0.9));
-    }
-    .gara-card.live .gara-logo {
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-    }
-    .badge-closed { background: #555; color: #aaa; }
-    .badge-soon { background: #f39c12; color: #000; }
-    @keyframes pulse { 50% { opacity: 0.7; } }
     
-    .gara-footer {
-      background: rgba(0,0,0,0.2);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: #888;
-    }
-    .gara-footer span { display: flex; align-items: center; gap: 5px; }
-    
-    .empty-state {
+    /* No results */
+    .no-results {
       text-align: center;
-      padding: 60px 20px;
-      color: #666;
+      padding: var(--space-12);
+      color: var(--color-gray);
     }
-    .empty-state .icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
-    .empty-state p { font-size: 1rem; }
     
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #888;
+    .no-results svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: var(--space-4);
+      opacity: 0.3;
     }
-    .loading .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: #f39c12;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
   <nav class="navbar">
-    <a href="../">← Home</a>
-    <span class="brand">ARK Games</span>
-    <a href="profilo.html" class="profile-btn">👤</a>
-  </nav>
-  
-  <header>
-    <h1>🏆 Gare Disponibili</h1>
-    <p>Trova e iscriviti alle competizioni</p>
-  </header>
-  
-  <div class="tabs">
-    <button class="tab active" data-view="gare">🏋️ Gare</button>
-    <button class="tab" data-view="seasons">🏆 Seasons</button>
-  </div>
-  
-  <div class="container">
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <p>Caricamento...</p>
+    <a href="../" class="navbar-brand">
+      <span class="navbar-brand-text"><span>ARK</span> GAMES</span>
+    </a>
+    <div class="navbar-actions">
+      <button class="profile-btn" onclick="window.location.href='profilo.html'" title="Profilo">
+        👤
+      </button>
     </div>
-    <div id="garaList"></div>
-    <div id="seasonList" style="display:none;"></div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <picture class="page-hero-bg">
+      <source srcset="../assets/images/app/app-hero.webp" type="image/webp">
+      <img src="../assets/images/app/app-hero.jpg" alt="Arena" loading="eager">
+    </picture>
+    <div class="page-hero-content">
+      <div class="page-hero-icon">⚔️</div>
+      <h1>Arena</h1>
+      <p>Scegli la tua battaglia</p>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('all')">🔥 Tutte</button>
+    <button class="tab" onclick="switchTab('upcoming')">📅 Prossime</button>
+    <button class="tab" onclick="switchTab('live')">🔴 Live</button>
+    <button class="tab" onclick="switchTab('season')">🏆 Season</button>
   </div>
 
-  <script type="module">
-    import { DB } from '../firebase-config.js';
+  <!-- Search -->
+  <div class="search-container">
+    <div class="search-wrapper">
+      <svg class="search-icon" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Cerca gara..." oninput="filterGames()">
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="page-content">
+    <div class="cards-grid" id="cardsGrid">
+      <!-- Cards loaded dynamically -->
+    </div>
     
-    let competitions = {};
-    let seasons = {};
-    let currentView = 'gare';
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <div class="empty-state-icon">🏟️</div>
+      <h3>Nessuna Gara Disponibile</h3>
+      <p>Non ci sono competizioni al momento. Torna presto!</p>
+    </div>
     
-    // Tab switching
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.onclick = () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentView = tab.dataset.view;
+    <!-- No Results -->
+    <div class="no-results" id="noResults" style="display: none;">
+      <svg fill="currentColor" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <h3>Nessun risultato</h3>
+      <p>Prova con un altro termine di ricerca</p>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+
+  <script>
+    let allGames = [];
+    let allSeasons = [];
+    let currentTab = 'all';
+
+    async function loadData() {
+      const grid = document.getElementById('cardsGrid');
+      const emptyState = document.getElementById('emptyState');
+      
+      grid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--color-gray);">Caricamento arena...</div>';
+      
+      try {
+        // Load competitions and seasons
+        const [compSnap, seasonSnap] = await Promise.all([
+          firebase.database().ref('ark_competitions').once('value'),
+          firebase.database().ref('ark_seasons').once('value')
+        ]);
         
-        if (currentView === 'gare') {
-          document.getElementById('garaList').style.display = 'block';
-          document.getElementById('seasonList').style.display = 'none';
-          renderGareList();
+        const compData = compSnap.val() || {};
+        const seasonData = seasonSnap.val() || {};
+        
+        // Convert to arrays
+        allGames = Object.entries(compData).map(([id, data]) => ({
+          id,
+          ...data,
+          type: 'competition'
+        }));
+        
+        allSeasons = Object.entries(seasonData).map(([id, data]) => ({
+          id,
+          ...data,
+          type: 'season'
+        }));
+        
+        if (allGames.length === 0 && allSeasons.length === 0) {
+          grid.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+        
+        emptyState.style.display = 'none';
+        filterGames();
+      } catch (error) {
+        console.error('Load error:', error);
+        grid.innerHTML = '<div style="color: var(--color-danger); text-align: center; padding: 40px;">Errore di caricamento</div>';
+      }
+    }
+    
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      filterGames();
+    }
+    
+    function filterGames() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const grid = document.getElementById('cardsGrid');
+      const emptyState = document.getElementById('emptyState');
+      const noResults = document.getElementById('noResults');
+      
+      let items = [];
+      
+      // Filter by tab
+      if (currentTab === 'season') {
+        items = allSeasons;
+      } else if (currentTab === 'live') {
+        items = allGames.filter(g => g.status === 'live');
+      } else if (currentTab === 'upcoming') {
+        items = allGames.filter(g => g.status === 'upcoming' || !g.status);
+      } else {
+        items = [...allGames];
+      }
+      
+      // Filter by search
+      if (searchTerm) {
+        items = items.filter(g => 
+          (g.name || '').toLowerCase().includes(searchTerm) ||
+          (g.description || '').toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Sort by date (newest first)
+      items.sort((a, b) => {
+        const dateA = a.createdAt || a.date || 0;
+        const dateB = b.createdAt || b.date || 0;
+        return dateB - dateA;
+      });
+      
+      grid.innerHTML = '';
+      
+      if (items.length === 0) {
+        if (searchTerm) {
+          noResults.style.display = 'block';
+          emptyState.style.display = 'none';
         } else {
-          document.getElementById('garaList').style.display = 'none';
-          document.getElementById('seasonList').style.display = 'block';
-          renderSeasonList();
+          noResults.style.display = 'none';
+          emptyState.style.display = 'block';
         }
-      };
-    });
-    
-    function getBadge(comp) {
-      if (comp.status === 'live') return '<span class="gara-badge badge-live">🔴 GUARDA LIVE</span>';
-      if (comp.status === 'closed' || comp.status === 'done') return '<span class="gara-badge badge-closed">CONCLUSA</span>';
-      
-      const regOpen = comp.registrationOpen !== false;
-      if (regOpen) return '<span class="gara-badge badge-open">ISCRIVITI</span>';
-      return '<span class="gara-badge badge-soon">PROSSIMAMENTE</span>';
-    }
-    
-    function formatDate(dateStr) {
-      if (!dateStr) return 'Data TBD';
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    
-    function renderGareList() {
-      const list = document.getElementById('garaList');
-      const loading = document.getElementById('loading');
-      loading.style.display = 'none';
-      
-      let comps = Object.entries(competitions)
-        // Exclude drafts and unnamed competitions
-        .filter(([id, c]) => c.name && c.status !== 'draft');
-      
-      if (comps.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="icon">🏋️</div>
-            <p>Nessuna gara disponibile</p>
-          </div>
-        `;
         return;
       }
       
-      // Sort: LIVE first, then by date
-      comps.sort((a, b) => {
-        // LIVE competitions always first
-        if (a[1].status === 'live' && b[1].status !== 'live') return -1;
-        if (b[1].status === 'live' && a[1].status !== 'live') return 1;
-        // Then by date
-        return new Date(a[1].date || 0) - new Date(b[1].date || 0);
-      });
+      noResults.style.display = 'none';
+      emptyState.style.display = 'none';
       
-      list.innerHTML = comps.map(([id, comp]) => {
-        const isLive = comp.status === 'live';
-        const clickUrl = isLive ? `../live/leaderboard.html?c=${id}` : `gara.html?id=${id}`;
-        
-        return `
-        <div class="gara-card ${isLive ? 'live' : ''}" onclick="location.href='${clickUrl}'">
-          <div class="gara-header">
-            <div class="gara-logo">${comp.emoji || '🏆'}</div>
-            <div class="gara-info">
-              <h3>${comp.name || 'Gara Senza Nome'}</h3>
-              <div class="box-name">${comp.boxName || 'CrossFit Box'}</div>
-              <div class="date">📅 ${formatDate(comp.date)}</div>
-            </div>
-            ${getBadge(comp)}
-          </div>
-          <div class="gara-footer">
-            ${isLive ? `
-              <span>🏆 Classifica Live</span>
-              <span>📺 Guarda</span>
-            ` : `
-              <span>👥 ${comp.athleteCount || 0} iscritti</span>
-              <span>🏋️ ${comp.wodCount || 0} WOD</span>
-              <span>💰 €${comp.price || 0}</span>
-              ${comp.prizePool && comp.prizePool.trim ? `<span style="color:#f1c40f;">🏆 Premi</span>` : ''}
-            `}
+      items.forEach(item => {
+        const card = createCard(item);
+        grid.appendChild(card);
+      });
+    }
+    
+    function createCard(item) {
+      const div = document.createElement('div');
+      div.className = 'game-card';
+      
+      const isLive = item.status === 'live';
+      const isSeason = item.type === 'season';
+      const athleteCount = item.athletes ? Object.keys(item.athletes).length : 0;
+      const wodCount = item.workouts ? Object.keys(item.workouts).length : (item.wods ? Object.keys(item.wods).length : 0);
+      
+      let badgeClass = isLive ? 'live' : (isSeason ? 'upcoming' : 'upcoming');
+      let badgeText = isLive ? '🔴 LIVE' : (isSeason ? '🏆 SEASON' : 'PROSSIMA');
+      
+      let icon = isSeason ? '🏆' : '⚔️';
+      let detailUrl = isSeason ? `season.html?id=${item.id}` : `gara.html?id=${item.id}`;
+      
+      div.innerHTML = `
+        <div class="game-card-header">
+          <span class="game-card-badge ${badgeClass}">${badgeText}</span>
+          <div class="card-icon">${icon}</div>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">${item.name || 'Senza nome'}</h3>
+          <div class="game-card-meta">
+            <span class="game-card-meta-item">👥 ${athleteCount}</span>
+            <span class="game-card-meta-item">💪 ${wodCount} WOD</span>
+            ${item.teamBased ? '<span class="type-badge team">TEAM</span>' : '<span class="type-badge individual">INDIVIDUALE</span>'}
           </div>
         </div>
-      `}).join('');
-    }
-    
-    // Load competitions and count WODs/athletes dynamically
-    DB.listen('competitions', async (data) => {
-      competitions = data || {};
-      
-      // Count WODs and registrations for each competition
-      for (const [id, comp] of Object.entries(competitions)) {
-        // Count WODs
-        const wods = await DB.get(`competitions/${id}/workouts`);
-        comp.wodCount = wods ? Object.keys(wods).length : 0;
-        
-        // Count registrations
-        const regs = await DB.get(`competitions/${id}/registrations`);
-        comp.athleteCount = regs ? Object.values(regs).filter(r => r.status === 'confirmed').length : 0;
-        
-        // Count teams as backup
-        if (comp.athleteCount === 0) {
-          const teams = await DB.get(`competitions/${id}/teams`);
-          comp.athleteCount = teams ? Object.keys(teams).length : 0;
-        }
-      }
-      
-      renderGareList();
-    });
-    
-    // Load and render seasons
-    async function loadSeasons() {
-      seasons = await DB.get('seasons') || {};
-      if (currentView === 'seasons') {
-        renderSeasonList();
-      }
-    }
-    
-    function getSeasonBadge(season) {
-      if (season.status === 'active') return '<span class="gara-badge badge-live">🟢 IN CORSO</span>';
-      if (season.status === 'registration') return '<span class="gara-badge badge-open">ISCRIVITI</span>';
-      if (season.status === 'completed') return '<span class="gara-badge badge-closed">COMPLETATA</span>';
-      return '<span class="gara-badge badge-soon">PROSSIMAMENTE</span>';
-    }
-    
-    function renderSeasonList() {
-      const list = document.getElementById('seasonList');
-      const loading = document.getElementById('loading');
-      loading.style.display = 'none';
-      
-      // Filter: only show published seasons (registration or active)
-      let seasonList = Object.entries(seasons)
-        .filter(([id, s]) => s.name && (s.status === 'registration' || s.status === 'active'));
-      
-      if (seasonList.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="icon">🏆</div>
-            <p>Nessuna season disponibile</p>
-          </div>
-        `;
-        return;
-      }
-      
-      // Sort: Active first, then by start date
-      seasonList.sort((a, b) => {
-        if (a[1].status === 'active' && b[1].status !== 'active') return -1;
-        if (b[1].status === 'active' && a[1].status !== 'active') return 1;
-        return new Date(a[1].startDate || 0) - new Date(b[1].startDate || 0);
-      });
-      
-      list.innerHTML = seasonList.map(([id, season]) => {
-        const isActive = season.status === 'active';
-        
-        return `
-        <div class="gara-card ${isActive ? 'live' : ''}" onclick="location.href='season.html?id=${id}'">
-          <div class="gara-header">
-            <div class="gara-logo" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">${season.emoji || '🏆'}</div>
-            <div class="gara-info">
-              <h3>${season.name || 'Season Senza Nome'}</h3>
-              <div class="box-name">${season.categories?.join(' · ') || 'CrossFit'}</div>
-              <div class="date">📅 ${formatDate(season.startDate)} → ${formatDate(season.endDate)}</div>
-            </div>
-            ${getSeasonBadge(season)}
-          </div>
-          <div class="gara-footer">
-            <span>👥 ${season.teamCount || 0} team</span>
-            <span>🏋️ ${season.wodCount || 0} WOD</span>
-            <span>💰 €${season.price || 0}</span>
-            ${season.prizePool && season.prizePool.trim ? `<span style="color:#f1c40f;">🏆 Premi</span>` : ''}
-          </div>
+        <div class="game-card-footer">
+          <span class="game-card-action">ENTRA →</span>
         </div>
-      `}).join('');
+      `;
+      
+      div.onclick = () => window.location.href = detailUrl;
+      return div;
     }
-    
-    // Initial load of seasons
-    loadSeasons();
-    DB.listen('seasons', (data) => {
-      seasons = data || {};
-      if (currentView === 'seasons') {
-        renderSeasonList();
-      }
-    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
 </html>

@@ -3,539 +3,482 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin - ARK Games</title>
+  <title>Admin - ARK Games 3.0</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    /* Texture background */
+    .login-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('../assets/images/texture-grunge.webp') center/cover;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    
+    /* Animated chains decoration */
+    .chains-left, .chains-right {
+      position: fixed;
+      top: 0;
+      width: 60px;
+      height: 100%;
+      background: url('../assets/images/texture-chainlink.webp') repeat-y;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .chains-left { left: 0; }
+    .chains-right { right: 0; }
+    
+    /* Logo animation */
+    .login-logo-icon {
+      animation: iconGlow 3s ease-in-out infinite;
+    }
+    @keyframes iconGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(233, 69, 96, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(233, 69, 96, 0.8), 0 0 60px rgba(243, 156, 18, 0.4); }
+    }
+    
+    /* Error shake */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    .shake { animation: shake 0.3s ease; }
+    
+    /* Success state */
+    .login-box.success {
+      border-color: var(--color-success);
+      box-shadow: 0 0 30px rgba(46, 204, 113, 0.3);
+    }
+    
+    /* Dashboard layout */
+    .dashboard-screen {
+      display: none;
       min-height: 100vh;
-      min-height: 100dvh;
-      color: white;
     }
-    
-    /* Login Screen */
-    .login-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .login-box {
-      background: rgba(255,255,255,0.05);
-      border-radius: 24px;
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .login-box .logo { text-align: center; margin-bottom: 30px; }
-    .login-box .logo .icon { font-size: 3rem; margin-bottom: 10px; }
-    .login-box .logo h1 {
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, #f39c12, #e74c3c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .login-box .logo p { color: #888; font-size: 0.9rem; margin-top: 5px; }
-    
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
+    .dashboard-screen.active {
       display: block;
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    .form-group input {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      padding: 15px;
-      color: white;
-      font-size: 16px;
-    }
-    .form-group input:focus { outline: none; border-color: #f39c12; }
-    .form-group input::placeholder { color: #555; }
     
-    .login-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #f39c12, #e67e22);
-      color: white;
-      border: none;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .login-btn:hover { opacity: 0.9; }
-    
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 25px;
-      color: #888;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .back-link:hover { color: #f39c12; }
-    
-    .error-msg {
-      background: rgba(231, 76, 60, 0.15);
-      border: 1px solid rgba(231, 76, 60, 0.4);
-      padding: 12px;
-      border-radius: 10px;
-      color: #e74c3c;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
+    .login-screen.hidden {
       display: none;
     }
-    
-    /* Dashboard */
-    .dashboard { display: none; }
-    .dashboard.active { display: block; }
-    
-    .navbar {
-      background: rgba(0,0,0,0.4);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-    }
-    .navbar .brand { color: #f39c12; font-weight: 700; font-size: 1.1rem; }
-    .navbar .user-info { display: flex; align-items: center; gap: 10px; }
-    .navbar .user-info span { color: #888; font-size: 0.9rem; }
-    .navbar .logout-btn {
-      background: rgba(231, 76, 60, 0.2);
-      border: 1px solid rgba(231, 76, 60, 0.4);
-      color: #e74c3c;
-      padding: 8px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 25px 20px;
-    }
-    
-    .welcome { margin-bottom: 30px; }
-    .welcome h1 { font-size: 1.5rem; margin-bottom: 5px; }
-    .welcome p { color: #888; }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-    @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-    
-    .stat-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-    }
-    .stat-card .icon { font-size: 1.6rem; margin-bottom: 8px; }
-    .stat-card .number { font-size: 2rem; font-weight: 700; }
-    .stat-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; margin-top: 4px; }
-    .stat-card.highlight {
-      background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(231, 76, 60, 0.15));
-      border: 1px solid rgba(243, 156, 18, 0.3);
-    }
-    .stat-card.highlight .number { color: #f39c12; }
-    
-    .section { margin-bottom: 30px; }
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .section-header h2 { font-size: 1rem; color: #f39c12; text-transform: uppercase; letter-spacing: 1px; }
-    
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    @media (min-width: 600px) { .action-grid { grid-template-columns: repeat(4, 1fr); } }
-    
-    .action-btn {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-      padding: 22px 15px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      color: inherit;
-    }
-    .action-btn:hover { border-color: #f39c12; transform: translateY(-2px); }
-    .action-btn .icon { font-size: 2rem; margin-bottom: 10px; display: block; }
-    .action-btn span { font-size: 0.9rem; }
-    .action-btn.primary { background: linear-gradient(135deg, #f39c12, #e67e22); border: none; }
-    
-    .gara-list { display: flex; flex-direction: column; gap: 12px; }
-    .gara-item {
-      background: rgba(255,255,255,0.05);
-      border-radius: 14px;
-      padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .gara-item:hover { border-color: #f39c12; }
-    .gara-item .info h3 { font-size: 1rem; margin-bottom: 5px; }
-    .gara-item .info .meta { font-size: 0.8rem; color: #888; display: flex; gap: 15px; }
-    .gara-item .status {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .status-draft { background: #555; color: #aaa; }
-    .status-open { background: #27ae60; color: white; }
-    .status-live { background: #e74c3c; color: white; }
   </style>
 </head>
 <body>
+  <!-- Decorative chains -->
+  <div class="chains-left"></div>
+  <div class="chains-right"></div>
+
   <!-- Login Screen -->
   <div class="login-screen" id="loginScreen">
-    <div class="login-box">
-      <div class="logo">
-        <div class="icon">⚙️</div>
+    <div class="login-box" id="loginBox">
+      <div class="login-logo">
+        <div class="login-logo-icon">⚔️</div>
         <h1>ARK GAMES</h1>
-        <p>Area Organizzatori</p>
+        <p>Command Center</p>
       </div>
       
-      <div class="error-msg" id="errorMsg"></div>
-      
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="admin@tuobox.com">
-      </div>
-      
-      <div class="form-group">
-        <label>PIN (4 cifre)</label>
-        <input type="password" id="pin" placeholder="••••" maxlength="4" inputmode="numeric">
-      </div>
-      
-      <button class="login-btn" onclick="login()">Accedi →</button>
-      
-      <a href="../" class="back-link">← Torna alla Home</a>
-    </div>
-  </div>
-  
-  <!-- Dashboard -->
-  <div class="dashboard" id="dashboard">
-    <nav class="navbar">
-      <span class="brand">🏆 ARK Games Admin</span>
-      <div class="user-info">
-        <span id="userName"></span>
-        <button class="logout-btn" onclick="logout()">Esci</button>
-      </div>
-    </nav>
-    
-    <div class="container">
-      <div class="welcome">
-        <h1>Ciao! 👋</h1>
-        <p>Gestisci le tue competizioni</p>
-      </div>
-      
-      <!-- GARA IN CORSO - evidenziata -->
-      <div id="liveGaraSection" style="display:none;margin-bottom:25px;">
-        <div id="liveGaraCard" style="background:linear-gradient(135deg, rgba(231,69,96,0.2), rgba(231,69,96,0.1));border:2px solid #e74c3c;border-radius:20px;padding:25px;cursor:pointer;animation:pulse 2s infinite;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <span style="background:#e74c3c;color:white;padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;margin-bottom:10px;display:inline-block;">🔴 LIVE ORA</span>
-              <h2 id="liveGaraName" style="font-size:1.4rem;margin-top:8px;">Gara in corso</h2>
-              <p id="liveGaraInfo" style="color:#888;font-size:0.9rem;margin-top:5px;"></p>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-size:2.5rem;">🎬</span>
-              <p style="color:#e74c3c;font-weight:600;font-size:0.9rem;margin-top:5px;">Vai ai controlli →</p>
-            </div>
+      <form class="login-form" id="loginForm" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input 
+            type="email" 
+            class="form-input" 
+            id="emailInput"
+            placeholder="admin@arkgames.it"
+            autocomplete="email"
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">PIN di Accesso</label>
+          <div class="pin-container" id="pinContainer">
+            <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="0">
+            <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="1">
+            <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="2">
+            <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="3">
           </div>
+          <p id="pinError" class="form-error" style="display: none; text-align: center;">PIN errato. Riprova.</p>
         </div>
-      </div>
-      <style>
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
-      </style>
+        
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: var(--space-4);" onclick="attemptLogin()">
+          ENTRA NELL'ARENA →
+        </button>
+      </form>
       
-      <div class="stats-grid">
-        <div class="stat-card highlight">
-          <div class="icon">🏆</div>
-          <div class="number" id="statGare">0</div>
-          <div class="label">Gare</div>
-        </div>
-        <div class="stat-card">
-          <div class="icon">👥</div>
-          <div class="number" id="statAtleti">0</div>
-          <div class="label">Atleti</div>
-        </div>
-        <div class="stat-card">
-          <div class="icon">💰</div>
-          <div class="number" id="statRevenue">€0</div>
-          <div class="label">Revenue</div>
-        </div>
-        <div class="stat-card">
-          <div class="icon">📅</div>
-          <div class="number" id="statProssima">-</div>
-          <div class="label">Prossima</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <div class="section-header">
-          <h2>⚡ Azioni Rapide</h2>
-        </div>
-        <div class="action-grid" style="grid-template-columns: 1fr 1fr;">
-          <a href="gara.html" class="action-btn primary">
-            <span class="icon">➕</span>
-            <span>Nuova Gara</span>
-          </a>
-          <a href="season.html" class="action-btn" style="border-color:#f39c12;">
-            <span class="icon">🏆</span>
-            <span>Nuova Season</span>
-          </a>
-        </div>
-        <p style="color:#666;font-size:0.85rem;text-align:center;margin-top:15px;">
-          <strong>Gara:</strong> Evento singolo (1 giorno) · <strong>Season:</strong> Lega a lungo termine (mesi)
-        </p>
-      </div>
-      
-      <div class="section">
-        <div class="section-header">
-          <h2>🔥 Le Tue Gare</h2>
-        </div>
-        <div class="gara-list" id="garaList">
-          <div style="color:#888;text-align:center;padding:30px;">Caricamento...</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <div class="section-header">
-          <h2>🏆 Le Tue Seasons</h2>
-        </div>
-        <div class="gara-list" id="seasonList">
-          <div style="color:#888;text-align:center;padding:30px;">Caricamento...</div>
-        </div>
-      </div>
+      <p style="text-align: center; color: var(--color-gray); font-size: var(--text-sm); margin-top: var(--space-6);">
+        Solo per organizzatori autorizzati
+      </p>
     </div>
   </div>
 
-  <script type="module">
-    import { DB } from '../firebase-config.js';
+  <!-- Dashboard (after login) -->
+  <div class="dashboard-screen" id="dashboardScreen">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <a href="../" class="navbar-brand">
+        <span class="navbar-brand-text"><span>ARK</span> GAMES</span>
+      </a>
+      <div class="navbar-actions">
+        <span id="userEmail" style="color: var(--color-gray); font-size: var(--text-sm); margin-right: var(--space-3);"></span>
+        <button class="navbar-btn" onclick="logout()" title="Logout">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+      <picture class="page-hero-bg">
+        <source srcset="../assets/images/admin/admin-hero.webp" type="image/webp">
+        <img src="../assets/images/admin/admin-hero.jpg" alt="Command Center" loading="eager">
+      </picture>
+      <div class="page-hero-content">
+        <div class="page-hero-icon">🎮</div>
+        <h1>Command Center</h1>
+        <p>Crea e gestisci le tue competizioni</p>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('gare')">🏆 Gare</button>
+      <button class="tab" onclick="switchTab('season')">📅 Season</button>
+      <button class="tab" onclick="switchTab('wods')">💪 WODs</button>
+    </div>
+
+    <!-- Content -->
+    <div class="page-content">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-value" id="statGare">0</div>
+          <div class="stat-card-label">Gare Totali</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statAtleti">0</div>
+          <div class="stat-card-label">Atleti</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statWods">0</div>
+          <div class="stat-card-label">WODs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statLive">0</div>
+          <div class="stat-card-label">Live Ora</div>
+        </div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="cards-grid" id="cardsGrid">
+        <!-- Cards loaded dynamically -->
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state-icon">⚔️</div>
+        <h3>Nessuna Battaglia</h3>
+        <p>Crea la tua prima competizione e porta i guerrieri nell'arena.</p>
+        <button class="btn btn-primary" onclick="createNew()">+ CREA GARA</button>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="createNew()" title="Crea nuovo">
+      <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+
+  <script>
+    // ========== PIN INPUT LOGIC ==========
+    const pinDigits = document.querySelectorAll('.pin-digit');
     
-    // Check if logged in
-    const session = localStorage.getItem('ark_admin_session');
-    if (session) {
-      showDashboard(JSON.parse(session));
+    pinDigits.forEach((digit, index) => {
+      digit.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val;
+        
+        if (val && index < pinDigits.length - 1) {
+          pinDigits[index + 1].focus();
+        }
+        
+        if (val) {
+          e.target.classList.add('filled');
+        }
+        
+        // Auto-submit when all filled
+        const fullPin = getPin();
+        if (fullPin.length === 4) {
+          attemptLogin();
+        }
+      });
+      
+      digit.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          pinDigits[index - 1].focus();
+          pinDigits[index - 1].value = '';
+          pinDigits[index - 1].classList.remove('filled');
+        }
+      });
+      
+      digit.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const digits = paste.replace(/[^0-9]/g, '').slice(0, 4).split('');
+        
+        digits.forEach((d, i) => {
+          if (pinDigits[i]) {
+            pinDigits[i].value = d;
+            pinDigits[i].classList.add('filled');
+          }
+        });
+        
+        if (digits.length === 4) {
+          attemptLogin();
+        }
+      });
+    });
+    
+    function getPin() {
+      return Array.from(pinDigits).map(d => d.value).join('');
     }
     
-    window.login = async () => {
-      const email = document.getElementById('email').value.trim();
-      const pin = document.getElementById('pin').value.trim();
+    function clearPin() {
+      pinDigits.forEach(d => {
+        d.value = '';
+        d.classList.remove('filled');
+      });
+      pinDigits[0].focus();
+    }
+
+    // ========== AUTH ==========
+    const VALID_CREDENTIALS = {
+      'eugenio.morsani@live.it': '1234',
+      'admin@arkgames.it': '1234'
+    };
+    
+    function attemptLogin() {
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const pin = getPin();
+      const loginBox = document.getElementById('loginBox');
+      const pinError = document.getElementById('pinError');
       
-      if (!email || !pin) {
-        showError('Inserisci email e PIN');
-        return;
+      if (!email || pin.length !== 4) return;
+      
+      if (VALID_CREDENTIALS[email] === pin) {
+        // Success
+        pinError.style.display = 'none';
+        loginBox.classList.add('success');
+        
+        // Save session
+        localStorage.setItem('arkAdminEmail', email);
+        localStorage.setItem('arkAdminSession', Date.now().toString());
+        
+        setTimeout(() => {
+          showDashboard(email);
+        }, 500);
+      } else {
+        // Error
+        pinError.style.display = 'block';
+        loginBox.classList.add('shake');
+        setTimeout(() => loginBox.classList.remove('shake'), 300);
+        clearPin();
       }
+    }
+    
+    function showDashboard(email) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.add('active');
+      document.getElementById('userEmail').textContent = email;
+      loadData();
+    }
+    
+    function logout() {
+      localStorage.removeItem('arkAdminEmail');
+      localStorage.removeItem('arkAdminSession');
+      location.reload();
+    }
+    
+    function checkSession() {
+      const email = localStorage.getItem('arkAdminEmail');
+      const session = localStorage.getItem('arkAdminSession');
       
-      if (pin.length !== 4 || !/^\d+$/.test(pin)) {
-        showError('Il PIN deve essere di 4 cifre');
-        return;
+      if (email && session) {
+        const sessionAge = Date.now() - parseInt(session);
+        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+        
+        if (sessionAge < maxAge) {
+          showDashboard(email);
+          return true;
+        }
       }
+      return false;
+    }
+
+    // ========== DATA ==========
+    let currentTab = 'gare';
+    
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      loadData();
+    }
+    
+    async function loadData() {
+      const grid = document.getElementById('cardsGrid');
+      const emptyState = document.getElementById('emptyState');
       
-      // Check credentials in Firebase
-      const admins = await DB.get('admins');
-      const adminEntry = admins ? Object.entries(admins).find(([id, a]) => 
-        a.email?.toLowerCase() === email.toLowerCase() && a.pin === pin
-      ) : null;
+      grid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--color-gray);">Caricamento...</div>';
       
-      if (!adminEntry) {
-        // For demo: auto-create admin if none exists
-        if (!admins || Object.keys(admins).length === 0) {
-          const newId = 'admin_' + Date.now();
-          await DB.set(`admins/${newId}`, { email, pin, name: email.split('@')[0], createdAt: Date.now() });
-          const session = { id: newId, email, name: email.split('@')[0] };
-          localStorage.setItem('ark_admin_session', JSON.stringify(session));
-          showDashboard(session);
+      try {
+        let path = '';
+        switch(currentTab) {
+          case 'gare': path = 'ark_competitions'; break;
+          case 'season': path = 'ark_seasons'; break;
+          case 'wods': path = 'ark_wods'; break;
+        }
+        
+        const snapshot = await firebase.database().ref(path).once('value');
+        const data = snapshot.val();
+        
+        if (!data) {
+          grid.innerHTML = '';
+          emptyState.style.display = 'block';
+          updateStats({});
           return;
         }
-        showError('Credenziali non valide');
-        return;
+        
+        emptyState.style.display = 'none';
+        renderCards(data);
+        updateStats(data);
+      } catch (error) {
+        console.error('Load error:', error);
+        grid.innerHTML = '<div style="color: var(--color-danger); text-align: center; padding: 40px;">Errore di caricamento</div>';
       }
-      
-      const session = { id: adminEntry[0], email: adminEntry[1].email, name: adminEntry[1].name || email };
-      localStorage.setItem('ark_admin_session', JSON.stringify(session));
-      showDashboard(session);
-    };
-    
-    window.logout = () => {
-      localStorage.removeItem('ark_admin_session');
-      location.reload();
-    };
-    
-    function showError(msg) {
-      const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.style.display = 'block';
     }
     
-    function showDashboard(session) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').classList.add('active');
-      document.getElementById('userName').textContent = session.name || session.email;
-      loadGare();
-    }
-    
-    async function loadGare() {
-      const session = JSON.parse(localStorage.getItem('ark_admin_session') || '{}');
-      const allCompetitions = await DB.get('competitions') || {};
-      const list = document.getElementById('garaList');
+    function renderCards(data) {
+      const grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
       
-      // FILTER: show only this admin's competitions
-      const comps = Object.entries(allCompetitions)
-        .filter(([id, c]) => c.adminId === session.id);
-      
-      // Check for LIVE competition (only this admin's)
-      const liveComp = comps.find(([id, c]) => c.status === 'live' && c.adminId === session.id);
-      const liveSection = document.getElementById('liveGaraSection');
-      
-      if (liveComp) {
-        liveSection.style.display = 'block';
-        document.getElementById('liveGaraName').textContent = `${liveComp[1].emoji || '🏆'} ${liveComp[1].name || 'Gara'}`;
-        document.getElementById('liveGaraInfo').textContent = `${liveComp[1].athleteCount || 0} atleti · ${liveComp[1].date || ''}`;
-        document.getElementById('liveGaraCard').onclick = () => {
-          // Go directly to LIVE controls
-          location.href = `gara.html?id=${liveComp[0]}&tab=live`;
-        };
-      } else {
-        liveSection.style.display = 'none';
-      }
-      
-      // Stats
-      document.getElementById('statGare').textContent = comps.length;
-      let totalAthletes = 0;
-      let totalRevenue = 0;
-      comps.forEach(([id, c]) => {
-        totalAthletes += c.athleteCount || 0;
-        totalRevenue += (c.athleteCount || 0) * (c.price || 0);
+      const entries = Object.entries(data).sort((a, b) => {
+        const dateA = a[1].createdAt || a[1].date || 0;
+        const dateB = b[1].createdAt || b[1].date || 0;
+        return dateB - dateA;
       });
-      document.getElementById('statAtleti').textContent = totalAthletes;
-      document.getElementById('statRevenue').textContent = '€' + totalRevenue;
       
-      // Find next competition
-      const upcoming = comps
-        .filter(([id, c]) => c.date && new Date(c.date) > new Date())
-        .sort((a, b) => new Date(a[1].date) - new Date(b[1].date))[0];
-      if (upcoming) {
-        const days = Math.ceil((new Date(upcoming[1].date) - new Date()) / (1000*60*60*24));
-        document.getElementById('statProssima').textContent = days + 'g';
-      }
-      
-      if (comps.length === 0) {
-        list.innerHTML = `
-          <div style="text-align:center;padding:40px;color:#666;">
-            <div style="font-size:3rem;margin-bottom:15px;">🏋️</div>
-            <p>Nessuna gara creata</p>
-            <p style="margin-top:10px;"><a href="gara.html" style="color:#f39c12;">Crea la tua prima gara →</a></p>
-          </div>
-        `;
-        return;
-      }
-      
-      list.innerHTML = comps.map(([id, c]) => {
-        let statusClass = 'status-draft';
-        let statusText = 'BOZZA';
-        if (c.status === 'live') { statusClass = 'status-live'; statusText = '🔴 LIVE'; }
-        else if (c.registrationOpen) { statusClass = 'status-open'; statusText = 'APERTA'; }
-        
-        return `
-          <div class="gara-item" onclick="location.href='gara.html?id=${id}'">
-            <div class="info">
-              <h3>${c.emoji || '🏆'} ${c.name || 'Gara senza nome'}</h3>
-              <div class="meta">
-                <span>📅 ${c.date || 'TBD'}</span>
-                <span>👥 ${c.athleteCount || 0}</span>
-                <span>💰 €${(c.athleteCount || 0) * (c.price || 0)}</span>
-              </div>
-            </div>
-            <span class="status ${statusClass}">${statusText}</span>
-          </div>
-        `;
-      }).join('');
-      
-      // Also load seasons
-      loadSeasons();
+      entries.forEach(([id, item]) => {
+        const card = createCard(id, item);
+        grid.appendChild(card);
+      });
     }
     
-    async function loadSeasons() {
-      const session = JSON.parse(localStorage.getItem('ark_admin_session') || '{}');
-      const allSeasons = await DB.get('seasons') || {};
-      const list = document.getElementById('seasonList');
+    function createCard(id, item) {
+      const div = document.createElement('div');
+      div.className = 'game-card';
       
-      // FILTER: show only this admin's seasons
-      const seasons = Object.entries(allSeasons)
-        .filter(([id, s]) => s.adminId === session.id);
+      const isLive = item.status === 'live';
+      const isUpcoming = item.status === 'upcoming' || !item.status;
+      const athleteCount = item.athletes ? Object.keys(item.athletes).length : 0;
+      const wodCount = item.workouts ? Object.keys(item.workouts).length : 0;
       
-      if (seasons.length === 0) {
-        list.innerHTML = `
-          <div style="text-align:center;padding:40px;color:#666;">
-            <div style="font-size:3rem;margin-bottom:15px;">🏆</div>
-            <p>Nessuna season creata</p>
-            <p style="margin-top:10px;"><a href="season.html" style="color:#f39c12;">Crea la tua prima season →</a></p>
-          </div>
-        `;
-        return;
+      let badgeClass = isLive ? 'live' : (isUpcoming ? 'upcoming' : 'completed');
+      let badgeText = isLive ? '🔴 LIVE' : (isUpcoming ? 'PROSSIMA' : 'COMPLETATA');
+      
+      let editUrl = '';
+      switch(currentTab) {
+        case 'gare': editUrl = `gara.html?id=${id}`; break;
+        case 'season': editUrl = `season.html?id=${id}`; break;
+        case 'wods': editUrl = `wods.html?id=${id}`; break;
       }
       
-      list.innerHTML = seasons.map(([id, s]) => {
-        let statusClass = 'status-draft';
-        let statusText = 'BOZZA';
-        if (s.status === 'active') { statusClass = 'status-live'; statusText = '🟢 ATTIVA'; }
-        else if (s.status === 'registration') { statusClass = 'status-open'; statusText = 'ISCRIZIONI'; }
-        else if (s.status === 'completed') { statusClass = ''; statusText = '✓ FINITA'; }
-        
-        // Count teams
-        const teamCount = s.teamCount || 0;
-        
-        return `
-          <div class="gara-item" onclick="location.href='season.html?id=${id}'">
-            <div class="info">
-              <h3>${s.emoji || '🏆'} ${s.name || 'Season senza nome'}</h3>
-              <div class="meta">
-                <span>📅 ${s.startDate || '?'} → ${s.endDate || '?'}</span>
-                <span>👥 ${teamCount} team</span>
-              </div>
-            </div>
-            <span class="status ${statusClass}">${statusText}</span>
+      div.innerHTML = `
+        <div class="game-card-header">
+          <span class="game-card-badge ${badgeClass}">${badgeText}</span>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">${item.name || 'Senza nome'}</h3>
+          <div class="game-card-meta">
+            <span class="game-card-meta-item">👥 ${athleteCount} atleti</span>
+            <span class="game-card-meta-item">💪 ${wodCount} WODs</span>
           </div>
-        `;
-      }).join('');
+        </div>
+        <div class="game-card-footer">
+          <span class="game-card-action">GESTISCI →</span>
+          <button class="navbar-btn" onclick="event.stopPropagation(); deleteItem('${id}')" title="Elimina">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </button>
+        </div>
+      `;
+      
+      div.onclick = () => window.location.href = editUrl;
+      return div;
     }
     
-    // Enter key to login
-    document.getElementById('pin').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') login();
+    function updateStats(data) {
+      const count = data ? Object.keys(data).length : 0;
+      
+      switch(currentTab) {
+        case 'gare':
+          document.getElementById('statGare').textContent = count;
+          break;
+        case 'wods':
+          document.getElementById('statWods').textContent = count;
+          break;
+      }
+    }
+    
+    function createNew() {
+      switch(currentTab) {
+        case 'gare': window.location.href = 'gara.html'; break;
+        case 'season': window.location.href = 'season.html'; break;
+        case 'wods': window.location.href = 'wods.html'; break;
+      }
+    }
+    
+    async function deleteItem(id) {
+      if (!confirm('Eliminare questo elemento?')) return;
+      
+      let path = '';
+      switch(currentTab) {
+        case 'gare': path = 'ark_competitions'; break;
+        case 'season': path = 'ark_seasons'; break;
+        case 'wods': path = 'ark_wods'; break;
+      }
+      
+      try {
+        await firebase.database().ref(`${path}/${id}`).remove();
+        loadData();
+      } catch (error) {
+        alert('Errore durante l\'eliminazione');
+      }
+    }
+
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!checkSession()) {
+        // Focus first input
+        document.getElementById('emailInput').focus();
+      }
     });
   </script>
 </body>
