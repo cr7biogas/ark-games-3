@@ -232,6 +232,7 @@
     <button class="tab" data-tab="wod">💪 WOD</button>
     <button class="tab" data-tab="teams">👥 Team</button>
     <button class="tab" data-tab="timeline">📅 Timeline</button>
+    <button class="tab" data-tab="scores">📊 Punteggi</button>
     <button class="tab" data-tab="control">🎮 Controllo</button>
   </div>
   
@@ -417,6 +418,63 @@ Open</textarea>
         <div id="timelineList">
           <div class="empty-state">Timeline non generata</div>
         </div>
+      </div>
+    </div>
+    
+    <!-- SCORES -->
+    <div class="section" id="sec-scores">
+      <div class="card">
+        <h2>📊 Punteggi Gara</h2>
+        <p style="color:#888;margin-bottom:15px;">Visualizza e modifica i punteggi di tutti gli atleti/team</p>
+        
+        <div style="margin-bottom:15px;">
+          <label style="color:#888;font-size:0.9rem;">Filtra per WOD:</label>
+          <select id="scoreWodFilter" onchange="filterScores()" style="margin-left:10px;padding:8px 12px;border-radius:8px;border:1px solid #444;background:#1a1a2e;color:white;">
+            <option value="all">Tutti i WOD</option>
+          </select>
+        </div>
+        
+        <div id="scoresTable" style="overflow-x:auto;">
+          <div class="empty-state">Caricamento punteggi...</div>
+        </div>
+        
+        <div style="margin-top:20px;display:flex;gap:10px;">
+          <button class="btn btn-secondary" onclick="loadScores()">🔄 Aggiorna</button>
+          <button class="btn btn-secondary" onclick="exportScores()">📥 Esporta CSV</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>➕ Aggiungi/Modifica Punteggio</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Team/Atleta</label>
+            <select id="scoreTeam">
+              <option value="">Seleziona...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>WOD</label>
+            <select id="scoreWod">
+              <option value="">Seleziona...</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Tipo Score</label>
+            <select id="scoreType" onchange="toggleScoreInput()">
+              <option value="time">⏱️ Tempo (mm:ss)</option>
+              <option value="reps">🔢 Reps</option>
+              <option value="weight">🏋️ Peso (kg)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Valore</label>
+            <input type="text" id="scoreValue" placeholder="es: 5:30 o 150">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveScore()">💾 Salva Punteggio</button>
       </div>
     </div>
     
@@ -957,6 +1015,218 @@ Open</textarea>
       const text = '📱 Link per giudicare la gara:\n\n';
       window.open(`https://wa.me/?text=${encodeURIComponent(text + url)}`, '_blank');
     };
+    
+    updateJudgeLink();
+    
+    // ===== SCORES MANAGEMENT =====
+    let allScores = {};
+    
+    async function loadScores() {
+      const scores = await DB.get(`${basePath}/scores`) || {};
+      allScores = scores;
+      
+      // Populate WOD filter
+      const wodFilter = document.getElementById('scoreWodFilter');
+      const wods = await DB.get(`${basePath}/workouts`) || {};
+      wodFilter.innerHTML = '<option value="all">Tutti i WOD</option>' +
+        Object.entries(wods).map(([id, w]) => `<option value="${id}">${w.name || id}</option>`).join('');
+      
+      // Populate team and wod selects for manual entry
+      const teams = await DB.get(`${basePath}/teams`) || {};
+      document.getElementById('scoreTeam').innerHTML = '<option value="">Seleziona...</option>' +
+        Object.entries(teams).map(([id, t]) => `<option value="${id}">${t.name || id}</option>`).join('');
+      document.getElementById('scoreWod').innerHTML = '<option value="">Seleziona...</option>' +
+        Object.entries(wods).map(([id, w]) => `<option value="${id}">${w.name || id}</option>`).join('');
+      
+      renderScoresTable(scores, wods, teams);
+    }
+    
+    function renderScoresTable(scores, wods, teams) {
+      const container = document.getElementById('scoresTable');
+      const filter = document.getElementById('scoreWodFilter').value;
+      
+      const wodList = Object.entries(wods || {});
+      const teamList = Object.entries(teams || {});
+      
+      if (teamList.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nessun team registrato</div>';
+        return;
+      }
+      
+      // Build table
+      let html = `<table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.1);">
+            <th style="padding:10px;text-align:left;border-bottom:1px solid #444;">Team</th>
+            ${wodList.filter(([id]) => filter === 'all' || filter === id).map(([id, w]) => 
+              `<th style="padding:10px;text-align:center;border-bottom:1px solid #444;">${w.name || id}</th>`
+            ).join('')}
+            <th style="padding:10px;text-align:center;border-bottom:1px solid #444;">Totale Pts</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      
+      // Calculate scores for each team
+      const teamScores = {};
+      teamList.forEach(([teamId, team]) => {
+        teamScores[teamId] = { name: team.name, wods: {}, total: 0 };
+      });
+      
+      // Process scores
+      Object.entries(scores).forEach(([key, score]) => {
+        const [teamId, wodId] = key.split('_');
+        if (teamScores[teamId]) {
+          teamScores[teamId].wods[wodId] = score;
+        }
+      });
+      
+      // Calculate points (simplified: lower rank = more points)
+      wodList.forEach(([wodId, wod]) => {
+        const wodScores = teamList.map(([teamId]) => ({
+          teamId,
+          score: teamScores[teamId]?.wods[wodId]
+        })).filter(s => s.score);
+        
+        // Sort by score (time = lower is better, reps = higher is better)
+        wodScores.sort((a, b) => {
+          const aVal = a.score.timeSec || -a.score.reps || 0;
+          const bVal = b.score.timeSec || -b.score.reps || 0;
+          return aVal - bVal;
+        });
+        
+        // Assign points (100 for 1st, 90 for 2nd, etc.)
+        wodScores.forEach((s, i) => {
+          const points = Math.max(100 - i * 10, 10);
+          if (teamScores[s.teamId]) {
+            teamScores[s.teamId].total += points;
+          }
+        });
+      });
+      
+      // Sort teams by total points
+      const sortedTeams = Object.entries(teamScores).sort((a, b) => b[1].total - a[1].total);
+      
+      sortedTeams.forEach(([teamId, data], rank) => {
+        html += `<tr style="border-bottom:1px solid #333;">
+          <td style="padding:10px;"><strong>${rank + 1}.</strong> ${data.name}</td>
+          ${wodList.filter(([id]) => filter === 'all' || filter === id).map(([wodId]) => {
+            const score = data.wods[wodId];
+            let display = '-';
+            if (score) {
+              if (score.timeSec) {
+                const min = Math.floor(score.timeSec / 60);
+                const sec = score.timeSec % 60;
+                display = `${min}:${sec.toString().padStart(2, '0')}`;
+              } else if (score.reps) {
+                display = `${score.reps} reps`;
+              } else if (score.weight) {
+                display = `${score.weight} kg`;
+              }
+            }
+            return `<td style="padding:10px;text-align:center;cursor:pointer;" 
+              onclick="editScore('${teamId}', '${wodId}')">${display}</td>`;
+          }).join('')}
+          <td style="padding:10px;text-align:center;font-weight:bold;color:#f39c12;">${data.total}</td>
+        </tr>`;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    
+    window.filterScores = async () => {
+      const wods = await DB.get(`${basePath}/workouts`) || {};
+      const teams = await DB.get(`${basePath}/teams`) || {};
+      renderScoresTable(allScores, wods, teams);
+    };
+    
+    window.editScore = (teamId, wodId) => {
+      document.getElementById('scoreTeam').value = teamId;
+      document.getElementById('scoreWod').value = wodId;
+      const score = allScores[`${teamId}_${wodId}`];
+      if (score) {
+        if (score.timeSec) {
+          document.getElementById('scoreType').value = 'time';
+          const min = Math.floor(score.timeSec / 60);
+          const sec = score.timeSec % 60;
+          document.getElementById('scoreValue').value = `${min}:${sec.toString().padStart(2, '0')}`;
+        } else if (score.reps) {
+          document.getElementById('scoreType').value = 'reps';
+          document.getElementById('scoreValue').value = score.reps;
+        } else if (score.weight) {
+          document.getElementById('scoreType').value = 'weight';
+          document.getElementById('scoreValue').value = score.weight;
+        }
+      }
+      // Scroll to form
+      document.getElementById('scoreTeam').scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    window.saveScore = async () => {
+      const teamId = document.getElementById('scoreTeam').value;
+      const wodId = document.getElementById('scoreWod').value;
+      const type = document.getElementById('scoreType').value;
+      const value = document.getElementById('scoreValue').value.trim();
+      
+      if (!teamId || !wodId || !value) {
+        alert('Compila tutti i campi!');
+        return;
+      }
+      
+      let scoreData = { updatedAt: Date.now(), manual: true };
+      
+      if (type === 'time') {
+        const parts = value.split(':');
+        const min = parseInt(parts[0]) || 0;
+        const sec = parseInt(parts[1]) || 0;
+        scoreData.timeSec = min * 60 + sec;
+      } else if (type === 'reps') {
+        scoreData.reps = parseInt(value) || 0;
+      } else if (type === 'weight') {
+        scoreData.weight = parseFloat(value) || 0;
+      }
+      
+      await DB.set(`${basePath}/scores/${teamId}_${wodId}`, scoreData);
+      alert('✅ Punteggio salvato!');
+      loadScores();
+    };
+    
+    window.exportScores = async () => {
+      const wods = await DB.get(`${basePath}/workouts`) || {};
+      const teams = await DB.get(`${basePath}/teams`) || {};
+      const scores = await DB.get(`${basePath}/scores`) || {};
+      
+      let csv = 'Team,' + Object.values(wods).map(w => w.name || 'WOD').join(',') + ',Totale\n';
+      
+      Object.entries(teams).forEach(([teamId, team]) => {
+        let row = [team.name || teamId];
+        let total = 0;
+        Object.entries(wods).forEach(([wodId]) => {
+          const score = scores[`${teamId}_${wodId}`];
+          if (score?.timeSec) {
+            const min = Math.floor(score.timeSec / 60);
+            const sec = score.timeSec % 60;
+            row.push(`${min}:${sec.toString().padStart(2, '0')}`);
+          } else if (score?.reps) {
+            row.push(score.reps + ' reps');
+          } else {
+            row.push('-');
+          }
+        });
+        row.push(total);
+        csv += row.join(',') + '\n';
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `punteggi_${compId || seasonId}.csv`;
+      a.click();
+    };
+    
+    // Load scores when scores tab is clicked
+    document.querySelector('[data-tab="scores"]').addEventListener('click', loadScores);
     
     updateJudgeLink();
     loadCompetition();
