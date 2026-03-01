@@ -33,10 +33,30 @@
       position: absolute;
       top: 20px;
       left: 20px;
+      z-index: 10;
     }
     .back-link a {
       color: #888;
       text-decoration: none;
+      display: inline-block;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+    
+    /* Fix mobile button clicks */
+    .btn {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .event-actions {
+      position: relative;
+      z-index: 5;
+    }
+    .event-card {
+      position: relative;
     }
     .container {
       max-width: 800px;
@@ -94,14 +114,20 @@
       flex-wrap: wrap;
     }
     .btn {
-      padding: 10px 20px;
+      padding: 12px 20px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
       font-size: 0.9rem;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(233,69,96,0.3);
+      touch-action: manipulation;
+      min-height: 44px; /* iOS minimum touch target */
     }
     .btn-primary {
       background: #e94560;
