@@ -224,7 +224,7 @@
           </div>
         `;
       } else {
-        liveContainer.innerHTML = liveComps.map(e => renderEventCard(e, true)).join('');
+        liveContainer.innerHTML = liveComps.map(comp => renderEventCard(comp, true)).join('');
       }
       
       // Render upcoming
@@ -237,7 +237,7 @@
           </div>
         `;
       } else {
-        upcomingContainer.innerHTML = upcomingComps.slice(0, 5).map(e => renderEventCard(e, false)).join('');
+        upcomingContainer.innerHTML = upcomingComps.slice(0, 5).map(comp => renderEventCard(comp, false)).join('');
       }
       
       // Render seasons
@@ -250,25 +250,25 @@
           </div>
         `;
       } else {
-        seasonsContainer.innerHTML = activeSeasons.map(e => renderSeasonCard(e)).join('');
+        seasonsContainer.innerHTML = activeSeasons.map(s => renderSeasonCard(s)).join('');
       }
     }
     
-    function renderEventCard(event, isLive) {
-      const param = `c=${event.id}`;
+    function renderEventCard(comp, isLive) {
+      const param = `c=${comp.id}`;
       return `
         <div class="event-card ${isLive ? 'live' : ''}">
           <div class="event-header">
-            <span class="event-name">${event.name || 'Gara'}</span>
+            <span class="event-name">${comp.name || 'Gara'}</span>
             ${isLive ? '<span class="event-badge">🔴 LIVE</span>' : ''}
           </div>
           <div class="event-info">
-            📅 ${event.date || 'Data TBD'} • 🏠 ${event.boxName || 'Box'}
+            📅 ${comp.date || 'Data TBD'} • 🏠 ${comp.boxName || 'Box'}
           </div>
           <div class="event-actions">
-            <a href="tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
-            <a href="leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
-            <a href="output.html?${param}" class="btn btn-secondary">📡 OBS</a>
+            <a href="/live/tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
+            <a href="/live/leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
+            <a href="/live/output.html?${param}" class="btn btn-secondary">📡 OBS</a>
           </div>
         </div>
       `;
@@ -286,8 +286,8 @@
             📅 ${season.startDate || '?'} → ${season.endDate || '?'}
           </div>
           <div class="event-actions">
-            <a href="tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
-            <a href="leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
+            <a href="/live/tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
+            <a href="/live/leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
           </div>
         </div>
       `;
