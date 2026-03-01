@@ -611,8 +611,8 @@ Beginner</textarea>
   </div>
 
   <script type="module">
-    import { DB } from '../firebase-config.js';
-    import { generateWods, setApiKey, hasApiKey } from '../ai-generator.js';
+    import { DB } from './firebase-config.js';
+    import { generateWods, setApiKey, hasApiKey } from './ai-generator.js';
     
     const params = new URLSearchParams(location.search);
     let seasonId = params.get('id');
@@ -1402,13 +1402,13 @@ Beginner</textarea>
         `${formatDate(event.date)} · ${wod?.name || 'WOD'}`;
       
       // Set links
-      document.getElementById('judgeLink').href = `../judge.html?s=${seasonId}&date=${event.date}`;
-      document.getElementById('regiaLink').href = `../regia.html?s=${seasonId}`;
-      document.getElementById('cameraLink').href = `../camera-webrtc.html?c=${seasonId}`;
-      document.getElementById('streamLink').href = `../stream-webrtc.html?c=${seasonId}`;
-      document.getElementById('outputLink').href = `../live/output.html?c=${seasonId}`;
-      document.getElementById('tvLink').href = `../live/tv.html?c=${seasonId}`;
-      document.getElementById('leaderboardSeasonLink').href = `../live/leaderboard.html?s=${seasonId}`;
+      document.getElementById('judgeLink').href = `./judge.html?s=${seasonId}&date=${event.date}`;
+      document.getElementById('regiaLink').href = `./regia.html?s=${seasonId}`;
+      document.getElementById('cameraLink').href = `./camera-webrtc.html?c=${seasonId}`;
+      document.getElementById('streamLink').href = `./stream-webrtc.html?c=${seasonId}`;
+      document.getElementById('outputLink').href = `./live/output.html?c=${seasonId}`;
+      document.getElementById('tvLink').href = `./live/tv.html?c=${seasonId}`;
+      document.getElementById('leaderboardSeasonLink').href = `./live/leaderboard.html?s=${seasonId}`;
     }
     
     window.openLiveEvent = async () => {
@@ -1484,7 +1484,7 @@ Beginner</textarea>
       if (seasonId && Object.keys(schedule).length > 0) {
         populateLiveEventDates();
         setupLiveListeners();
-        document.getElementById('leaderboardSeasonLink').href = `../live/leaderboard.html?s=${seasonId}`;
+        document.getElementById('leaderboardSeasonLink').href = `./live/leaderboard.html?s=${seasonId}`;
       }
     }, 500);
   </script>
