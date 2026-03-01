@@ -243,7 +243,7 @@
       try {
         // Load competitions and seasons
         const [compData, seasonData] = await Promise.all([
-          DB.rawGet('ark_competitions'),
+          DB.get('competitions'),
           DB.rawGet('ark_seasons')
         ]);
         
@@ -352,8 +352,8 @@
       let badgeClass = isLive ? 'live' : (isSeason ? 'upcoming' : 'upcoming');
       let badgeText = isLive ? 'LIVE' : (isSeason ? 'SEASON' : 'PROSSIMA');
       
-      // Use logo if available, otherwise show icon
-      const hasLogo = item.logo && item.logo.startsWith('data:');
+      // Use logo if available (base64 or R2 URL), otherwise show icon
+      const hasLogo = item.logo && (item.logo.startsWith('data:') || item.logo.startsWith('http'));
       const headerStyle = hasLogo ? `style="background-image: url('${item.logo}'); background-size: cover; background-position: center;"` : '';
       
       let detailUrl = isSeason ? `season.html?id=${item.id}` : `gara.html?id=${item.id}`;

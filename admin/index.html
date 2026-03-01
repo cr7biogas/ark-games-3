@@ -69,6 +69,23 @@
     .login-screen.hidden {
       display: none;
     }
+    
+    /* Card with cover image */
+    .game-card-header[style*="background-image"] {
+      min-height: 120px;
+      position: relative;
+    }
+    .game-card-header[style*="background-image"]::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+    .game-card-header[style*="background-image"] .game-card-badge {
+      position: relative;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -396,10 +413,14 @@
       const isLive = item.status === 'live';
       const isUpcoming = item.status === 'upcoming' || !item.status;
       const athleteCount = item.athletes ? Object.keys(item.athletes).length : 0;
-      const wodCount = item.workouts ? Object.keys(item.workouts).length : 0;
+      const wodCount = item.workouts ? Object.keys(item.workouts).length : (item.wodCount || 0);
       
       let badgeClass = isLive ? 'live' : (isUpcoming ? 'upcoming' : 'completed');
       let badgeText = isLive ? '🔴 LIVE' : (isUpcoming ? 'PROSSIMA' : 'COMPLETATA');
+      
+      // Check for logo (base64 or R2 URL)
+      const hasLogo = item.logo && (item.logo.startsWith('data:') || item.logo.startsWith('http'));
+      const headerStyle = hasLogo ? `style="background-image: url('${item.logo}'); background-size: cover; background-position: center;"` : '';
       
       let editUrl = '';
       switch(currentTab) {
@@ -409,7 +430,7 @@
       }
       
       div.innerHTML = `
-        <div class="game-card-header">
+        <div class="game-card-header" ${headerStyle}>
           <span class="game-card-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="game-card-body">
