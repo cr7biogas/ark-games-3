@@ -12,7 +12,7 @@ import { getDatabase, ref, set, get, push, update, remove, onValue, off } from "
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Database helpers
+// Database helpers (ark2/ prefix for competitions, seasons, etc.)
 const DB = {
   ref: (path) => ref(db, `ark2/${path}`),
   set: (path, data) => set(ref(db, `ark2/${path}`), data),
@@ -27,7 +27,14 @@ const DB = {
     const r = ref(db, `ark2/${path}`);
     onValue(r, snap => callback(snap.val()));
     return () => off(r);
-  }
+  },
+  // Raw methods without ark2/ prefix (for legacy paths like ark_competitions)
+  rawGet: async (path) => {
+    const snap = await get(ref(db, path));
+    return snap.exists() ? snap.val() : null;
+  },
+  rawSet: (path, data) => set(ref(db, path), data),
+  rawRemove: (path) => remove(ref(db, path))
 };
 
 export { db, DB, ref, set, get, push, update, remove, onValue, off };

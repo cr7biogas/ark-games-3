@@ -201,11 +201,9 @@
   </div>
 
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="../firebase-config.js"></script>
-
-  <script>
+  <script type="module">
+    import { DB } from '../firebase-config.js';
+    
     // ========== PIN INPUT LOGIC ==========
     const pinDigits = document.querySelectorAll('.pin-digit');
     
@@ -355,8 +353,7 @@
           case 'wods': path = 'ark_wods'; break;
         }
         
-        const snapshot = await firebase.database().ref(path).once('value');
-        const data = snapshot.val();
+        const data = await DB.rawGet(path);
         
         if (!data) {
           grid.innerHTML = '';
@@ -466,7 +463,7 @@
       }
       
       try {
-        await firebase.database().ref(`${path}/${id}`).remove();
+        await DB.rawRemove(`${path}/${id}`);
         loadData();
       } catch (error) {
         alert('Errore durante l\'eliminazione');
