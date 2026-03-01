@@ -714,7 +714,7 @@ Scaled</textarea>
     // Logo Upload State
     let currentLogo = null;
     
-    // Handle logo upload
+    // Handle logo upload - uploads to R2 and stores URL
     window.handleLogoUpload = async (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -731,14 +731,42 @@ Scaled</textarea>
         return;
       }
       
-      // Compress and convert to base64
-      const compressedBase64 = await compressImage(file, 800, 0.8);
-      currentLogo = compressedBase64;
-      
-      // Show preview
       const preview = document.getElementById('logoPreview');
-      preview.innerHTML = `<img src="${compressedBase64}" alt="Logo gara">`;
-      document.getElementById('removeLogo').style.display = 'inline-block';
+      preview.innerHTML = '<div class="upload-placeholder"><p>⏳ Caricamento...</p></div>';
+      
+      try {
+        // Compress and convert to base64
+        const compressedBase64 = await compressImage(file, 800, 0.8);
+        
+        // Upload to R2
+        const filename = `comp_${compId || Date.now()}_cover`;
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            image: compressedBase64, 
+            filename,
+            folder: 'ark-games/covers'
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.url) {
+          currentLogo = result.url;
+          preview.innerHTML = `<img src="${result.url}" alt="Logo gara">`;
+          document.getElementById('removeLogo').style.display = 'inline-block';
+        } else {
+          throw new Error(result.error || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        // Fallback to base64 if R2 fails
+        const compressedBase64 = await compressImage(file, 800, 0.8);
+        currentLogo = compressedBase64;
+        preview.innerHTML = `<img src="${compressedBase64}" alt="Logo gara">`;
+        document.getElementById('removeLogo').style.display = 'inline-block';
+      }
     };
     
     // Compress image
