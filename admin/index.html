@@ -271,7 +271,7 @@
       'admin@arkgames.it': '1234'
     };
     
-    function attemptLogin() {
+    window.attemptLogin = function() {
       const email = document.getElementById('emailInput').value.trim().toLowerCase();
       const pin = getPin();
       const loginBox = document.getElementById('loginBox');
@@ -307,7 +307,7 @@
       loadData();
     }
     
-    function logout() {
+    window.logout = function() {
       localStorage.removeItem('arkAdminEmail');
       localStorage.removeItem('arkAdminSession');
       location.reload();
@@ -332,7 +332,7 @@
     // ========== DATA ==========
     let currentTab = 'gare';
     
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
@@ -444,7 +444,7 @@
       }
     }
     
-    function createNew() {
+    window.createNew = function() {
       switch(currentTab) {
         case 'gare': window.location.href = 'gara.html'; break;
         case 'season': window.location.href = 'season.html'; break;
@@ -452,7 +452,7 @@
       }
     }
     
-    async function deleteItem(id) {
+    window.deleteItem = async function(id) {
       if (!confirm('Eliminare questo elemento?')) return;
       
       let path = '';
