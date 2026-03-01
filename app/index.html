@@ -102,6 +102,22 @@
     .game-card-header {
       background: linear-gradient(135deg, var(--color-dark-gray), var(--color-charcoal));
       position: relative;
+      height: 140px;
+    }
+    
+    /* When card has logo background */
+    .game-card-header[style*="background-image"] {
+      height: 160px;
+    }
+    .game-card-header[style*="background-image"]::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+    }
+    .game-card-header[style*="background-image"] .game-card-badge {
+      position: relative;
+      z-index: 1;
     }
     
     .game-card-header .card-icon {
@@ -117,10 +133,16 @@
       justify-content: center;
       font-size: 1.5rem;
       box-shadow: var(--shadow-md);
+      color: white;
     }
     
     .game-card-body {
       padding-top: var(--space-8);
+    }
+    
+    /* Card without logo - smaller header */
+    .game-card-header:not([style*="background-image"]) {
+      height: 100px;
     }
     
     /* No results */
@@ -328,21 +350,24 @@
       const wodCount = item.workouts ? Object.keys(item.workouts).length : (item.wods ? Object.keys(item.wods).length : 0);
       
       let badgeClass = isLive ? 'live' : (isSeason ? 'upcoming' : 'upcoming');
-      let badgeText = isLive ? '🔴 LIVE' : (isSeason ? '🏆 SEASON' : 'PROSSIMA');
+      let badgeText = isLive ? 'LIVE' : (isSeason ? 'SEASON' : 'PROSSIMA');
       
-      let icon = isSeason ? '🏆' : '⚔️';
+      // Use logo if available, otherwise show icon
+      const hasLogo = item.logo && item.logo.startsWith('data:');
+      const headerStyle = hasLogo ? `style="background-image: url('${item.logo}'); background-size: cover; background-position: center;"` : '';
+      
       let detailUrl = isSeason ? `season.html?id=${item.id}` : `gara.html?id=${item.id}`;
       
       div.innerHTML = `
-        <div class="game-card-header">
+        <div class="game-card-header" ${headerStyle}>
           <span class="game-card-badge ${badgeClass}">${badgeText}</span>
-          <div class="card-icon">${icon}</div>
+          ${!hasLogo ? `<div class="card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 1012 0V2z"/></svg></div>` : ''}
         </div>
         <div class="game-card-body">
           <h3 class="game-card-title">${item.name || 'Senza nome'}</h3>
           <div class="game-card-meta">
-            <span class="game-card-meta-item">👥 ${athleteCount}</span>
-            <span class="game-card-meta-item">💪 ${wodCount} WOD</span>
+            <span class="game-card-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> ${athleteCount}</span>
+            <span class="game-card-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 00-2-2 2 2 0 00-2 2v0"/><path d="M14 10V4a2 2 0 00-2-2 2 2 0 00-2 2v6"/><path d="M10 10.5V6a2 2 0 00-2-2 2 2 0 00-2 2v8"/><path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 012.83-2.82L7 15"/></svg> ${wodCount} WOD</span>
             ${item.teamBased ? '<span class="type-badge team">TEAM</span>' : '<span class="type-badge individual">INDIVIDUALE</span>'}
           </div>
         </div>
