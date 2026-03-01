@@ -205,11 +205,8 @@
   </div>
 
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="../firebase-config.js"></script>
-
-  <script>
+  <script type="module">
+    import { DB } from '../firebase-config.js';
     let allGames = [];
     let allSeasons = [];
     let currentTab = 'all';
@@ -222,22 +219,22 @@
       
       try {
         // Load competitions and seasons
-        const [compSnap, seasonSnap] = await Promise.all([
-          firebase.database().ref('ark_competitions').once('value'),
-          firebase.database().ref('ark_seasons').once('value')
+        const [compData, seasonData] = await Promise.all([
+          DB.rawGet('ark_competitions'),
+          DB.rawGet('ark_seasons')
         ]);
         
-        const compData = compSnap.val() || {};
-        const seasonData = seasonSnap.val() || {};
+        const compDataObj = compData || {};
+        const seasonDataObj = seasonData || {};
         
         // Convert to arrays
-        allGames = Object.entries(compData).map(([id, data]) => ({
+        allGames = Object.entries(compDataObj).map(([id, data]) => ({
           id,
           ...data,
           type: 'competition'
         }));
         
-        allSeasons = Object.entries(seasonData).map(([id, data]) => ({
+        allSeasons = Object.entries(seasonDataObj).map(([id, data]) => ({
           id,
           ...data,
           type: 'season'
@@ -257,7 +254,7 @@
       }
     }
     
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
