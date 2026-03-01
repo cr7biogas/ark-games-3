@@ -441,6 +441,17 @@ Open</textarea>
       </div>
       
       <div class="card">
+        <h2>📱 Link Giudici</h2>
+        <p style="color:#888;margin-bottom:10px;">Condividi questo link con i giudici:</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input type="text" id="judgeLink" readonly 
+            style="flex:1;min-width:200px;padding:12px;border-radius:8px;border:1px solid #444;background:#1a1a2e;color:#fff;font-size:14px;">
+          <button class="btn btn-secondary" onclick="copyJudgeLink()" style="white-space:nowrap;">📋 Copia</button>
+          <button class="btn btn-secondary" onclick="shareJudgeLink()" style="background:#25D366;white-space:nowrap;">📱 WhatsApp</button>
+        </div>
+      </div>
+      
+      <div class="card">
         <h2>🎮 Controllo Gara</h2>
         <div id="judgeStatus">
           <div class="empty-state">Nessun giudice connesso</div>
@@ -927,6 +938,27 @@ Open</textarea>
     }
     
     // Initialize
+    // Set judge link
+    function updateJudgeLink() {
+      const param = isSeasonMode ? `s=${seasonId}` : `c=${compId}`;
+      const judgeUrl = `${location.origin}/judge?${param}`;
+      document.getElementById('judgeLink').value = judgeUrl;
+    }
+    
+    window.copyJudgeLink = () => {
+      const input = document.getElementById('judgeLink');
+      input.select();
+      document.execCommand('copy');
+      alert('✅ Link copiato!');
+    };
+    
+    window.shareJudgeLink = () => {
+      const url = document.getElementById('judgeLink').value;
+      const text = '📱 Link per giudicare la gara:\n\n';
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + url)}`, '_blank');
+    };
+    
+    updateJudgeLink();
     loadCompetition();
     
     // Listen for judge connections
