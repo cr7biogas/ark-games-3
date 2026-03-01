@@ -852,11 +852,12 @@ Scaled</textarea>
         });
       });
       
+      const addedCount = window.pendingAiWods.length;
+      
       renderWods();
       closeAiPreview();
       
-      alert(`✅ ${window.pendingAiWods.length} WOD aggiunti alla gara!`);
-      window.pendingAiWods = null;
+      alert(`✅ ${addedCount} WOD aggiunti alla gara!`);
     };
     
     function saveCurrentWodValues() {
