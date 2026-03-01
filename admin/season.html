@@ -298,6 +298,8 @@
           <div class="form-group">
             <label>Numero Lane</label>
             <input type="number" id="numLanes" value="4" min="1" max="10">
+            <!-- teamsPerSlot = numLanes for backward compatibility -->
+            <input type="hidden" id="teamsPerSlot" value="4">
           </div>
           <div class="form-group">
             <label>Prezzo Iscrizione (€)</label>
@@ -745,6 +747,9 @@ Beginner</textarea>
       document.getElementById('calcLanes').textContent = calc.numLanes;
       document.getElementById('calcMaxCat').textContent = calc.maxTeamsPerCategory;
       document.getElementById('calcMaxTotal').textContent = calc.maxTeamsTotal + ` (${categories} cat)`;
+      
+      // Sync teamsPerSlot with numLanes
+      document.getElementById('teamsPerSlot').value = calc.numLanes;
       
       updateSummary();
     }
