@@ -4,68 +4,266 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live - ARK GAMES</title>
-  <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="../assets/css/live.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #888;
+    }
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .back-link a {
+      color: #888;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    .section h2 {
+      color: #f39c12;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    .event-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .event-card.live {
+      border-color: #e94560;
+      background: rgba(233,69,96,0.1);
+    }
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .event-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .event-badge {
+      background: #e94560;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .event-info {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    .event-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #e94560;
+      color: white;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .empty-state .icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
 
-  <section class="hero-section">
-    <picture class="hero-bg">
-      <source srcset="../assets/images/live/live-hero.webp" type="image/webp">
-      <img src="../assets/images/live/live-hero.jpg" alt="Live Arena" loading="eager">
-    </picture>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="back-link"><a href="../index.html">← ARENA</a></div>
-      <h1 class="page-title">
-        <span class="title-icon">🔴</span>
-        <span class="title-text">LIVE</span>
-      </h1>
-      <p class="page-subtitle">Witness greatness in real-time.</p>
-    </div>
-  </section>
+  <div class="back-link"><a href="../">← Home</a></div>
 
-  <section class="actions-section">
-    <div class="container">
-      <div class="action-grid">
-        
-        <div class="action-card">
-          <div class="card-header">
-            <span class="card-icon">📺</span>
-            <h2 class="card-title">TV DISPLAY</h2>
-          </div>
-          <div class="card-body"><p>Schermo pubblico. Grande formato. Energia pura.</p></div>
-          <div class="card-footer"><a href="tv.html" class="btn btn-primary">GUARDA →</a></div>
-        </div>
-        
-        <div class="action-card">
-          <div class="card-header">
-            <span class="card-icon">🏆</span>
-            <h2 class="card-title">CLASSIFICA</h2>
-          </div>
-          <div class="card-body"><p>Leaderboard live. Chi sta vincendo. Ora.</p></div>
-          <div class="card-footer"><a href="leaderboard.html" class="btn btn-secondary">RANK →</a></div>
-        </div>
-        
-        <div class="action-card">
-          <div class="card-header">
-            <span class="card-icon">📡</span>
-            <h2 class="card-title">OBS OUTPUT</h2>
-          </div>
-          <div class="card-body"><p>Output per OBS. Overlay professionale.</p></div>
-          <div class="card-footer"><a href="output.html" class="btn btn-secondary">CATTURA →</a></div>
-        </div>
-        
-      </div>
-    </div>
-  </section>
+  <div class="header">
+    <h1>🔴 LIVE</h1>
+    <p>Seleziona una gara o season da visualizzare</p>
+  </div>
 
-  <footer class="section-footer">
-    <p class="footer-text">GLORY UNFOLDS NOW</p>
-  </footer>
+  <div class="container">
+    
+    <!-- Gare Live -->
+    <div class="section">
+      <h2>🔴 GARE IN CORSO</h2>
+      <div id="liveEvents" class="loading">Caricamento...</div>
+    </div>
+    
+    <!-- Gare Programmate -->
+    <div class="section">
+      <h2>📅 GARE PROGRAMMATE</h2>
+      <div id="upcomingEvents" class="loading">Caricamento...</div>
+    </div>
+    
+    <!-- Seasons Attive -->
+    <div class="section">
+      <h2>🏆 SEASONS ATTIVE</h2>
+      <div id="activeSeasons" class="loading">Caricamento...</div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { DB } from '../firebase-config.js';
+    
+    async function loadEvents() {
+      // Load competitions
+      const competitions = await DB.get('competitions') || {};
+      const seasons = await DB.get('seasons') || {};
+      
+      // Separate live and upcoming
+      const liveComps = [];
+      const upcomingComps = [];
+      const activeSeasons = [];
+      
+      const today = new Date().toISOString().split('T')[0];
+      
+      Object.entries(competitions).forEach(([id, comp]) => {
+        if (comp.status === 'live') {
+          liveComps.push({ id, ...comp, type: 'competition' });
+        } else if (comp.date >= today) {
+          upcomingComps.push({ id, ...comp, type: 'competition' });
+        }
+      });
+      
+      Object.entries(seasons).forEach(([id, season]) => {
+        if (season.status === 'active' || season.status === 'registration') {
+          activeSeasons.push({ id, ...season, type: 'season' });
+        }
+      });
+      
+      // Render live events
+      const liveContainer = document.getElementById('liveEvents');
+      if (liveComps.length === 0) {
+        liveContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📺</div>
+            <p>Nessuna gara in corso</p>
+          </div>
+        `;
+      } else {
+        liveContainer.innerHTML = liveComps.map(e => renderEventCard(e, true)).join('');
+      }
+      
+      // Render upcoming
+      const upcomingContainer = document.getElementById('upcomingEvents');
+      if (upcomingComps.length === 0) {
+        upcomingContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📅</div>
+            <p>Nessuna gara programmata</p>
+          </div>
+        `;
+      } else {
+        upcomingContainer.innerHTML = upcomingComps.slice(0, 5).map(e => renderEventCard(e, false)).join('');
+      }
+      
+      // Render seasons
+      const seasonsContainer = document.getElementById('activeSeasons');
+      if (activeSeasons.length === 0) {
+        seasonsContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🏆</div>
+            <p>Nessuna season attiva</p>
+          </div>
+        `;
+      } else {
+        seasonsContainer.innerHTML = activeSeasons.map(e => renderSeasonCard(e)).join('');
+      }
+    }
+    
+    function renderEventCard(event, isLive) {
+      const param = `c=${event.id}`;
+      return `
+        <div class="event-card ${isLive ? 'live' : ''}">
+          <div class="event-header">
+            <span class="event-name">${event.name || 'Gara'}</span>
+            ${isLive ? '<span class="event-badge">🔴 LIVE</span>' : ''}
+          </div>
+          <div class="event-info">
+            📅 ${event.date || 'Data TBD'} • 🏠 ${event.boxName || 'Box'}
+          </div>
+          <div class="event-actions">
+            <a href="tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
+            <a href="leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
+            <a href="output.html?${param}" class="btn btn-secondary">📡 OBS</a>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderSeasonCard(season) {
+      const param = `s=${season.id}`;
+      return `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="event-name">${season.name || 'Season'}</span>
+            <span style="color:#27ae60;font-size:0.85rem;">${season.status === 'active' ? '🟢 Attiva' : '📨 Iscrizioni'}</span>
+          </div>
+          <div class="event-info">
+            📅 ${season.startDate || '?'} → ${season.endDate || '?'}
+          </div>
+          <div class="event-actions">
+            <a href="tv.html?${param}" class="btn btn-primary">📺 TV Display</a>
+            <a href="leaderboard.html?${param}" class="btn btn-secondary">🏆 Classifica</a>
+          </div>
+        </div>
+      `;
+    }
+    
+    loadEvents();
+  </script>
 
 </body>
 </html>
