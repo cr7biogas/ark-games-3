@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iscrizione - ARK GAMES</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="../assets/css/app.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    .registration-hero {
+      position: relative;
+      min-height: 40vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .registration-hero .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .registration-hero .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .registration-hero .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      background: linear-gradient(180deg, rgba(10,10,18,0.8) 0%, rgba(10,10,18,0.95) 100%);
+    }
+    .registration-hero .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: var(--space-8);
+    }
+    .form-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-16) var(--space-6);
+      background: var(--color-charcoal);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .form-actions {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: flex-end;
+      margin-top: var(--space-8);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="registration-hero">
+    <picture class="hero-bg">
+      <source srcset="../assets/images/app/registration-bg.webp" type="image/webp">
+      <img src="../assets/images/app/registration-bg.jpg" alt="Registration" loading="eager">
+    </picture>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="back-link"><a href="index.html">← ATLETA</a></div>
+      <h1 class="heading-2">ISCRIVITI ALLA GARA</h1>
+      <p class="body-lg" style="color: var(--color-gray); margin-top: var(--space-4);">Sign the contract. Enter the arena.</p>
+    </div>
+  </section>
+
+  <!-- Registration Form -->
+  <section class="form-section">
+    <form id="registrationForm" class="registration-form">
+      
+      <div class="form-group">
+        <label class="form-label" for="competition">Seleziona Gara</label>
+        <select id="competition" class="form-select" required>
+          <option value="">-- Scegli una competizione --</option>
+          <option value="test-gara-001">ARK Test Gara 🧪</option>
+          <!-- Popolato dinamicamente da Firebase -->
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="name">Nome Completo</label>
+          <input type="text" id="name" class="form-input" placeholder="Mario Rossi" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" id="email" class="form-input" placeholder="mario@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="phone">Telefono</label>
+          <input type="tel" id="phone" class="form-input" placeholder="+39 333 1234567">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="category">Categoria</label>
+          <select id="category" class="form-select" required>
+            <option value="">-- Scegli --</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Scaled">Scaled</option>
+            <option value="RX">RX</option>
+            <option value="Elite">Elite</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="teamType">Tipo Partecipazione</label>
+        <select id="teamType" class="form-select" required>
+          <option value="solo">Individual (Solo)</option>
+          <option value="team">Team</option>
+        </select>
+      </div>
+
+      <div id="teamNameGroup" class="form-group" style="display: none;">
+        <label class="form-label" for="teamName">Nome Team</label>
+        <input type="text" id="teamName" class="form-input" placeholder="Warriors United">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="notes">Note / Richieste Speciali</label>
+        <textarea id="notes" class="form-textarea" placeholder="Eventuali allergie, richieste particolari..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="display: flex; align-items: center; gap: var(--space-3); cursor: pointer;">
+          <input type="checkbox" id="privacy" required style="width: auto;">
+          <span>Accetto termini, condizioni e trattamento dati</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <a href="index.html" class="btn btn-ghost">Annulla</a>
+        <button type="submit" class="btn btn-primary">CONFERMA ISCRIZIONE →</button>
+      </div>
+
+    </form>
+  </section>
+
+  <script type="module">
+    // Team type logic
+    document.getElementById('teamType').addEventListener('change', (e) => {
+      const teamNameGroup = document.getElementById('teamNameGroup');
+      teamNameGroup.style.display = e.target.value === 'team' ? 'block' : 'none';
+    });
+
+    // Form submission
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = {
+        competition: document.getElementById('competition').value,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        category: document.getElementById('category').value,
+        teamType: document.getElementById('teamType').value,
+        teamName: document.getElementById('teamName').value,
+        notes: document.getElementById('notes').value,
+        registeredAt: Date.now()
+      };
+      
+      console.log('Registration data:', formData);
+      
+      // TODO: Firebase integration
+      // await DB.set(`registrations/${formData.email.replace(/[.@]/g, '_')}`, formData);
+      
+      alert('✅ Iscrizione inviata con successo! Ti contatteremo presto.');
+      window.location.href = 'index.html';
+    });
+  </script>
+
+</body>
+</html>
