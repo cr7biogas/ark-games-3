@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WOD Builder - ARK GAMES</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    .wod-hero {
+      position: relative;
+      min-height: 40vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .wod-hero .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .wod-hero .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .wod-hero .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      background: linear-gradient(180deg, rgba(10,10,18,0.8) 0%, rgba(10,10,18,0.95) 100%);
+    }
+    .wod-hero .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: var(--space-8);
+    }
+    .builder-section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: var(--space-16) var(--space-6);
+    }
+    .wod-list {
+      display: grid;
+      gap: var(--space-6);
+      margin-top: var(--space-8);
+    }
+    .wod-item {
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.1);
+      padding: var(--space-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      transition: var(--transition-base);
+    }
+    .wod-item:hover {
+      border-color: var(--color-teal);
+      background: rgba(255,255,255,0.05);
+    }
+    .wod-info h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      color: var(--color-teal);
+      margin-bottom: var(--space-2);
+    }
+    .wod-meta {
+      display: flex;
+      gap: var(--space-6);
+      font-size: var(--text-sm);
+      color: var(--color-gray);
+      margin-bottom: var(--space-3);
+    }
+    .wod-movements {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+    }
+    .wod-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="wod-hero">
+    <picture class="hero-bg">
+      <source srcset="../assets/images/admin/wod-builder-bg.webp" type="image/webp">
+      <img src="../assets/images/admin/wod-builder-bg.jpg" alt="WOD Planning" loading="eager">
+    </picture>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="back-link"><a href="index.html">← COMANDO</a></div>
+      <h1 class="heading-2">WOD BUILDER</h1>
+      <p class="body-lg" style="color: var(--color-gray); margin-top: var(--space-4);">Architect the battle. Design the WODs.</p>
+    </div>
+  </section>
+
+  <!-- Builder Section -->
+  <section class="builder-section">
+    
+    <!-- New WOD Form -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="heading-3">➕ Nuovo WOD</h2>
+      </div>
+      <div class="card-body">
+        <form id="wodForm">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="wodName">Nome WOD</label>
+              <input type="text" id="wodName" class="form-input" placeholder="FRAN, MURPH, GRACE..." required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="wodType">Tipo</label>
+              <select id="wodType" class="form-select" required>
+                <option value="for-time">For Time</option>
+                <option value="amrap">AMRAP</option>
+                <option value="emom">EMOM</option>
+                <option value="chipper">Chipper</option>
+                <option value="max-reps">Max Reps</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="timecap">Time Cap (minuti)</label>
+              <input type="number" id="timecap" class="form-input" placeholder="10" min="1" max="60">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="movements">Movimenti & Schema</label>
+            <textarea id="movements" class="form-textarea" placeholder="21-15-9&#10;Thrusters (95/65#)&#10;Pull-ups&#10;&#10;Oppure:&#10;AMRAP 10 min&#10;10 Burpees&#10;20 Box Jumps&#10;30 Wall Balls" rows="8" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="categories">Categorie</label>
+            <input type="text" id="categories" class="form-input" placeholder="RX, Scaled, Beginner (separati da virgola)">
+          </div>
+
+          <div class="form-actions" style="display: flex; justify-content: flex-end; gap: var(--space-4); margin-top: var(--space-6);">
+            <button type="reset" class="btn btn-ghost">Reset</button>
+            <button type="submit" class="btn btn-primary">CREA WOD →</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- WOD List -->
+    <div class="wod-list" id="wodList">
+      <!-- Example WOD -->
+      <div class="wod-item">
+        <div class="wod-info">
+          <h3>FRAN</h3>
+          <div class="wod-meta">
+            <span>⏱️ For Time</span>
+            <span>⏳ 8 min cap</span>
+            <span>📋 RX, Scaled</span>
+          </div>
+          <div class="wod-movements">
+            21-15-9<br>
+            Thrusters (95/65#)<br>
+            Pull-ups
+          </div>
+        </div>
+        <div class="wod-actions">
+          <button class="btn btn-sm btn-ghost" onclick="editWOD('fran')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteWOD('fran')">🗑️</button>
+        </div>
+      </div>
+
+      <div class="wod-item">
+        <div class="wod-info">
+          <h3>GRACE</h3>
+          <div class="wod-meta">
+            <span>⏱️ For Time</span>
+            <span>⏳ 8 min cap</span>
+            <span>📋 Beginner, RX</span>
+          </div>
+          <div class="wod-movements">
+            30 Clean & Jerks (135/95#)
+          </div>
+        </div>
+        <div class="wod-actions">
+          <button class="btn btn-sm btn-ghost" onclick="editWOD('grace')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteWOD('grace')">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <script type="module">
+    // Form submission
+    document.getElementById('wodForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const wodData = {
+        name: document.getElementById('wodName').value,
+        type: document.getElementById('wodType').value,
+        timecap: document.getElementById('timecap').value,
+        movements: document.getElementById('movements').value,
+        categories: document.getElementById('categories').value.split(',').map(c => c.trim()),
+        createdAt: Date.now()
+      };
+      
+      console.log('New WOD:', wodData);
+      
+      // TODO: Firebase integration
+      // await DB.set(`wods/${generateId()}`, wodData);
+      
+      alert('✅ WOD creato con successo!');
+      e.target.reset();
+    });
+
+    // Edit/Delete functions
+    window.editWOD = (id) => {
+      alert(`Edit WOD: ${id}`);
+      // TODO: Load WOD data into form
+    };
+
+    window.deleteWOD = (id) => {
+      if (confirm(`Eliminare il WOD ${id}?`)) {
+        console.log('Delete WOD:', id);
+        // TODO: Firebase delete
+      }
+    };
+  </script>
+
+</body>
+</html>
