@@ -550,27 +550,27 @@ Scaled</textarea>
           </button>
         </div>
         
-        <a href="#" onclick="return openWithCompId('../regia.html', event)" class="action-btn primary" style="display:block;text-align:center;padding:25px;font-size:1.2rem;text-decoration:none;border-radius:16px;background:linear-gradient(135deg, #e74c3c, #c0392b);color:white;margin-bottom:20px;">
+        <a href="#" onclick="return openWithCompId('./regia.html', event)" class="action-btn primary" style="display:block;text-align:center;padding:25px;font-size:1.2rem;text-decoration:none;border-radius:16px;background:linear-gradient(135deg, #e74c3c, #c0392b);color:white;margin-bottom:20px;">
           ⏱️ Apri Regia & Timer →
         </a>
         
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-          <a href="#" onclick="return openWithCompId('../judge.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./judge.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             ⚖️ Giudici
           </a>
-          <a href="#" onclick="return openWithCompId('../live/leaderboard.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./live/leaderboard.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             🏆 Classifica
           </a>
-          <a href="#" onclick="return openWithCompId('../live/tv.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./live/tv.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             📺 TV Display
           </a>
-          <a href="#" onclick="return openWithCompId('../stream-webrtc.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./stream-webrtc.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             📹 Regia Camere
           </a>
-          <a href="#" onclick="return openWithCompId('../camera-webrtc.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./camera-webrtc.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             📷 Aggiungi Camera
           </a>
-          <a href="#" onclick="return openWithCompId('../live/output.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
+          <a href="#" onclick="return openWithCompId('./live/output.html', event)" class="action-btn" style="text-align:center;padding:20px;text-decoration:none;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white;">
             🖥️ Output OBS
           </a>
         </div>
@@ -585,8 +585,8 @@ Scaled</textarea>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script type="module">
-    import { DB } from '../firebase-config.js';
-    import { generateWods, setApiKey, hasApiKey } from '../ai-generator.js';
+    import { DB } from './firebase-config.js';
+    import { generateWods, setApiKey, hasApiKey } from './ai-generator.js';
     
     const params = new URLSearchParams(location.search);
     let compId = params.get('id');
