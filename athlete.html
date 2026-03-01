@@ -259,7 +259,7 @@
           <div class="score-card">
             <div>
               <div class="score-wod">${wod.name}</div>
-              <div class="score-type">${wod.type.toUpperCase()}</div>
+              <div class="score-type">${(wod.type || 'WOD').toUpperCase()}</div>
             </div>
             <div>${scoreDisplay}</div>
           </div>

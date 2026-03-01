@@ -466,7 +466,7 @@ Open</textarea>
   </div>
 
   <script type="module">
-    import { DB } from '../firebase-config.js';
+    import { DB } from './firebase-config.js';
     
     // Get compId or seasonId from URL param
     const urlParams = new URLSearchParams(location.search);
@@ -743,7 +743,7 @@ Open</textarea>
           <div class="emoji">💪</div>
           <div class="info">
             <h4>${w.name}</h4>
-            <p>${w.type.toUpperCase()} · ${w.timeCapSec/60} min · ${w.categories?.join(', ') || 'Tutte'}</p>
+            <p>${(w.type || 'WOD').toUpperCase()} · ${(w.timeCapSec || w.timeCap*60 || 600)/60} min · ${w.categories?.join(', ') || 'Tutte'}</p>
             <p style="margin-top:4px">${w.movements?.map(m => m.name).join(', ') || ''}</p>
           </div>
           <div class="actions">
