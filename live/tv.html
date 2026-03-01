@@ -269,7 +269,7 @@
     
     // Determine mode: competition or season
     const isSeasonMode = !!seasonId && !compId;
-    const basePath = isSeasonMode ? `seasons/${seasonId}` : `${basePath}`;
+    const basePath = isSeasonMode ? `seasons/${seasonId}` : `competitions/${compId}`;
     
     if (compId) localStorage.setItem('ark2_compId', compId);
     if (seasonId) localStorage.setItem('ark2_seasonId', seasonId);
