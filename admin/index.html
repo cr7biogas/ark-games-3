@@ -348,13 +348,14 @@
       
       try {
         let path = '';
+        let useRaw = false;
         switch(currentTab) {
-          case 'gare': path = 'ark_competitions'; break;
-          case 'season': path = 'ark_seasons'; break;
-          case 'wods': path = 'ark_wods'; break;
+          case 'gare': path = 'competitions'; useRaw = false; break;
+          case 'season': path = 'ark_seasons'; useRaw = true; break;
+          case 'wods': path = 'ark_wods'; useRaw = true; break;
         }
         
-        const data = await DB.rawGet(path);
+        const data = useRaw ? await DB.rawGet(path) : await DB.get(path);
         
         if (!data) {
           grid.innerHTML = '';
@@ -457,14 +458,19 @@
       if (!confirm('Eliminare questo elemento?')) return;
       
       let path = '';
+      let useRaw = false;
       switch(currentTab) {
-        case 'gare': path = 'ark_competitions'; break;
-        case 'season': path = 'ark_seasons'; break;
-        case 'wods': path = 'ark_wods'; break;
+        case 'gare': path = 'competitions'; useRaw = false; break;
+        case 'season': path = 'ark_seasons'; useRaw = true; break;
+        case 'wods': path = 'ark_wods'; useRaw = true; break;
       }
       
       try {
-        await DB.rawRemove(`${path}/${id}`);
+        if (useRaw) {
+          await DB.rawRemove(`${path}/${id}`);
+        } else {
+          await DB.remove(`${path}/${id}`);
+        }
         loadData();
       } catch (error) {
         alert('Errore durante l\'eliminazione');
