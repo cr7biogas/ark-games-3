@@ -61,6 +61,8 @@
     .container {
       max-width: 800px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
     .section {
       margin-bottom: 40px;
@@ -112,6 +114,8 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 20;
     }
     .btn {
       padding: 12px 20px;
@@ -128,6 +132,8 @@
       -webkit-tap-highlight-color: rgba(233,69,96,0.3);
       touch-action: manipulation;
       min-height: 44px; /* iOS minimum touch target */
+      position: relative;
+      z-index: 30;
     }
     .btn-primary {
       background: #e94560;
@@ -156,7 +162,7 @@
 </head>
 <body>
 
-  <div class="back-link"><a href="../">← Home</a></div>
+  <div class="back-link"><a href="/">← Home</a></div>
 
   <div class="header">
     <h1>🔴 LIVE</h1>
