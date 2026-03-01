@@ -356,7 +356,11 @@
       const hasLogo = item.logo && (item.logo.startsWith('data:') || item.logo.startsWith('http'));
       const headerStyle = hasLogo ? `style="background-image: url('${item.logo}'); background-size: cover; background-position: center;"` : '';
       
-      let detailUrl = isSeason ? `season.html?id=${item.id}` : `gara.html?id=${item.id}`;
+      let detailUrl = isSeason ? `/app/season.html?id=${item.id}` : `/app/gara.html?id=${item.id}`;
+      let registerUrl = isSeason ? `/app/season.html?id=${item.id}` : `/app/iscrizione.html?c=${item.id}`;
+      
+      // Check if registration is open
+      const regOpen = item.registrationOpen !== false && item.status !== 'done';
       
       div.innerHTML = `
         <div class="game-card-header" ${headerStyle}>
@@ -371,12 +375,16 @@
             ${item.teamBased ? '<span class="type-badge team">TEAM</span>' : '<span class="type-badge individual">INDIVIDUALE</span>'}
           </div>
         </div>
-        <div class="game-card-footer">
-          <span class="game-card-action">ENTRA →</span>
+        <div class="game-card-footer" style="display:flex;justify-content:space-between;align-items:center;">
+          <a href="${detailUrl}" class="game-card-action" style="text-decoration:none;">INFO →</a>
+          ${regOpen ? `<a href="${registerUrl}" class="btn btn-cta" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:white;padding:8px 16px;border-radius:8px;font-weight:600;font-size:0.85rem;text-decoration:none;" onclick="event.stopPropagation()">ISCRIVITI</a>` : '<span style="color:#888;font-size:0.8rem;">Chiusa</span>'}
         </div>
       `;
       
-      div.onclick = () => window.location.href = detailUrl;
+      div.onclick = (e) => {
+        if (e.target.closest('.btn-cta')) return;
+        window.location.href = detailUrl;
+      };
       return div;
     }
 
