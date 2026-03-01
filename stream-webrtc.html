@@ -319,10 +319,20 @@
     <div class="dot"></div>
     <span class="count"><span id="camCount">0</span> camere online</span>
     <div class="actions">
-      <button class="btn" onclick="refreshAll()">🔄 Riconnetti Tutte</button>
+      <button class="btn" onclick="copyCameraLink()">📱 Link Camera</button>
+      <button class="btn" onclick="shareCameraLink()" style="background:#25D366;">📲 WA</button>
+      <button class="btn" onclick="refreshAll()">🔄</button>
       <button class="btn btn-success" onclick="goFullscreen()">📺 Output</button>
-      <button class="btn btn-danger" onclick="cleanupAll()">🗑️ Pulisci</button>
+      <button class="btn btn-danger" onclick="cleanupAll()">🗑️</button>
     </div>
+  </div>
+  
+  <div style="background:#1a1a24;padding:12px 20px;border-radius:8px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span style="color:#888;white-space:nowrap;">📹 Link Camera:</span>
+    <input type="text" id="cameraLinkInput" readonly 
+      style="flex:1;min-width:200px;padding:8px 12px;border-radius:6px;border:1px solid #333;background:#0a0a0f;color:#fff;font-size:13px;">
+    <button class="btn" onclick="copyCameraLink()">📋 Copia</button>
+    <button class="btn" onclick="shareCameraLink()" style="background:#25D366;">📱 WhatsApp</button>
   </div>
   
   <div class="main-grid">
@@ -666,6 +676,28 @@
         cam.unsubscribers.push(unsubCands);
       }
     }
+    
+    // Camera link functions
+    function updateCameraLink() {
+      const param = compId ? `c=${compId}` : seasonId ? `s=${seasonId}` : '';
+      const cameraUrl = `${location.origin}/camera-webrtc?${param}`;
+      const input = document.getElementById('cameraLinkInput');
+      if (input) input.value = cameraUrl;
+    }
+    updateCameraLink();
+    
+    window.copyCameraLink = () => {
+      const input = document.getElementById('cameraLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert('✅ Link camera copiato!\n\nCondividilo con chi deve trasmettere.');
+    };
+    
+    window.shareCameraLink = () => {
+      const url = document.getElementById('cameraLinkInput').value;
+      const text = '📹 Apri questo link per trasmettere la camera alla regia:\n\n';
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + url)}`, '_blank');
+    };
     
     window.refreshAll = async () => {
       log('Riconnessione tutte...');
