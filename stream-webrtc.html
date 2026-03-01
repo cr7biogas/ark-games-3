@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>🎬 Regia WebRTC - ARK Games</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, sans-serif; 
+      background: #0a0a0f; 
+      color: #fff; 
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    h1 { margin-bottom: 20px; font-size: 24px; }
+    
+    .status-bar {
+      background: #1a1a24;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .status-bar .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #2ecc71;
+    }
+    .status-bar .count { font-size: 18px; font-weight: bold; }
+    .status-bar .actions { margin-left: auto; display: flex; gap: 10px; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #333;
+      color: white;
+    }
+    .btn:hover { background: #444; }
+    .btn-danger { background: #e74c3c; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-success { background: #2ecc71; }
+    .btn-success:hover { background: #27ae60; }
+    
+    /* Fullscreen output mode */
+    .fullscreen-output {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+    }
+    .fullscreen-output.active { display: block; }
+    .fullscreen-output video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .fs-overlay-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 30px 40px;
+      background: linear-gradient(rgba(0,0,0,0.8), transparent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fs-logo {
+      font-size: 32px;
+      font-weight: 800;
+    }
+    .fs-live {
+      background: #e94560;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .fs-overlay-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 30px 40px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    }
+    .fs-timer {
+      font-size: 72px;
+      font-weight: 800;
+      font-family: 'SF Mono', Monaco, monospace;
+      color: #2ecc71;
+    }
+    .fs-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .fullscreen-output:hover .fs-close { opacity: 1; }
+    
+    /* Main grid - 2 rows */
+    .main-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .slot {
+      background: #1a1a24;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 3px solid transparent;
+    }
+    .slot.active { border-color: #e94560; }
+    .slot.has-video { border-color: #2ecc71; }
+    
+    .slot-header {
+      background: #12121a;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .slot-title { font-weight: 600; font-size: 16px; }
+    .slot-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+    }
+    .slot-status.live { background: #2ecc71; }
+    
+    .slot-video {
+      aspect-ratio: 16/9;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #444;
+      font-size: 48px;
+    }
+    .slot-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .slot-controls {
+      padding: 12px 15px;
+      display: flex;
+      gap: 10px;
+    }
+    .slot-controls select {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #0a0a0f;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .slot-controls select:hover { border-color: #555; }
+    .slot-controls select:focus { border-color: #e94560; outline: none; }
+    
+    /* Camera list */
+    h2 { margin-bottom: 15px; font-size: 18px; color: #888; }
+    
+    .camera-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+    }
+    
+    .camera-item {
+      background: #1a1a24;
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .camera-item .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .camera-item .dot.waiting { background: #f1c40f; }
+    .camera-item .dot.streaming { background: #2ecc71; }
+    .camera-item .dot.failed { background: #e74c3c; }
+    .camera-item .info { flex: 1; }
+    .camera-item .name { font-weight: 600; }
+    .camera-item .meta { font-size: 12px; color: #888; margin-top: 3px; }
+    .camera-item .assigned { 
+      background: #2ecc71; 
+      padding: 4px 10px; 
+      border-radius: 20px; 
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .empty { 
+      text-align: center; 
+      padding: 40px; 
+      color: #666;
+      background: #1a1a24;
+      border-radius: 12px;
+    }
+    
+    /* Output Control */
+    .output-control {
+      background: linear-gradient(135deg, #1a1a24, #2a1a30);
+      border: 2px solid #e94560;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    .output-control h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #e94560;
+    }
+    .output-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .output-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .output-row label:first-child {
+      min-width: 120px;
+      color: #888;
+    }
+    .output-row select {
+      flex: 1;
+      max-width: 200px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #0a0a0f;
+      color: white;
+      font-size: 14px;
+    }
+    .btn-small {
+      padding: 8px 15px;
+      font-size: 13px;
+    }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .toggle:hover { background: rgba(255,255,255,0.1); }
+    .toggle input { width: 16px; height: 16px; }
+    
+    /* Log */
+    .log {
+      margin-top: 30px;
+      background: #1a1a24;
+      border-radius: 12px;
+      padding: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: #888;
+    }
+    .log div { padding: 3px 0; }
+    .log .error { color: #e74c3c; }
+    .log .success { color: #2ecc71; }
+  </style>
+</head>
+<body>
+  <h1><a href="index.html" style="text-decoration:none;color:inherit;">🏠</a> 🎬 Regia WebRTC</h1>
+  
+  <!-- Fullscreen output mode -->
+  <div class="fullscreen-output" id="fullscreenOutput">
+    <video id="fsVideo" autoplay playsinline muted></video>
+    <div class="fs-overlay-top">
+      <div class="fs-logo">🏋️ ARK Games</div>
+      <div class="fs-live">🔴 LIVE</div>
+    </div>
+    <div class="fs-overlay-bottom">
+      <div class="fs-timer" id="fsTimer">00:00</div>
+    </div>
+    <button class="fs-close" onclick="exitFullscreen()">✕</button>
+  </div>
+  
+  <div class="status-bar">
+    <div class="dot"></div>
+    <span class="count"><span id="camCount">0</span> camere online</span>
+    <div class="actions">
+      <button class="btn" onclick="refreshAll()">🔄 Riconnetti Tutte</button>
+      <button class="btn btn-success" onclick="goFullscreen()">📺 Output</button>
+      <button class="btn btn-danger" onclick="cleanupAll()">🗑️ Pulisci</button>
+    </div>
+  </div>
+  
+  <div class="main-grid">
+    <div class="slot" data-slot="0">
+      <div class="slot-header">
+        <span class="slot-title">📍 Lane 1</span>
+        <div class="slot-status"></div>
+      </div>
+      <div class="slot-video">
+        <video autoplay playsinline muted></video>
+      </div>
+      <div class="slot-controls">
+        <select onchange="assignToSlot(0, this.value)">
+          <option value="">-- Seleziona Camera --</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="slot" data-slot="1">
+      <div class="slot-header">
+        <span class="slot-title">📍 Lane 2</span>
+        <div class="slot-status"></div>
+      </div>
+      <div class="slot-video">
+        <video autoplay playsinline muted></video>
+      </div>
+      <div class="slot-controls">
+        <select onchange="assignToSlot(1, this.value)">
+          <option value="">-- Seleziona Camera --</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="slot" data-slot="2">
+      <div class="slot-header">
+        <span class="slot-title">📍 Lane 3</span>
+        <div class="slot-status"></div>
+      </div>
+      <div class="slot-video">
+        <video autoplay playsinline muted></video>
+      </div>
+      <div class="slot-controls">
+        <select onchange="assignToSlot(2, this.value)">
+          <option value="">-- Seleziona Camera --</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="slot" data-slot="3">
+      <div class="slot-header">
+        <span class="slot-title">📍 Overview</span>
+        <div class="slot-status"></div>
+      </div>
+      <div class="slot-video">
+        <video autoplay playsinline muted></video>
+      </div>
+      <div class="slot-controls">
+        <select onchange="assignToSlot(3, this.value)">
+          <option value="">-- Seleziona Camera --</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Output Control Panel -->
+  <div class="output-control">
+    <h2>📺 Controllo Output</h2>
+    <div class="output-panel">
+      <div class="output-row">
+        <label>Camera Output:</label>
+        <select id="outputCameraSelect" onchange="setOutputCamera(this.value)">
+          <option value="">-- Nessuna --</option>
+        </select>
+        <button class="btn btn-small" onclick="sendToOutput()" title="Manda camera selezionata all'output">📤 LIVE</button>
+      </div>
+      <div class="output-row">
+        <span>Overlay:</span>
+        <label class="toggle"><input type="checkbox" id="ovLogo" checked onchange="updateOverlay()"> 🏋️ Logo</label>
+        <label class="toggle"><input type="checkbox" id="ovLive" checked onchange="updateOverlay()"> 🔴 Live</label>
+        <label class="toggle"><input type="checkbox" id="ovTimer" checked onchange="updateOverlay()"> ⏱️ Timer</label>
+        <label class="toggle"><input type="checkbox" id="ovWod" onchange="updateOverlay()"> 📋 WOD</label>
+      </div>
+    </div>
+  </div>
+  
+  <h2>📷 Camere Disponibili</h2>
+  <div class="camera-list" id="cameraList">
+    <div class="empty">In attesa di camere...<br>Apri camera-webrtc.html sui telefoni</div>
+  </div>
+  
+  <div class="log" id="log"></div>
+
+  <script type="module">
+    import { DB } from './firebase-config.js';
+    
+    // Get compId from URL - REQUIRED for multi-tenant
+    const params = new URLSearchParams(location.search);
+    const compId = params.get('c');
+    if (!compId) {
+      alert('❌ Manca parametro ?c=compId nell\'URL');
+    }
+    
+    // Paths isolated per competition
+    const streamsPath = `competitions/${compId}/streams`;
+    const outputConfigPath = `competitions/${compId}/outputConfig`;
+    
+    const ICE_SERVERS = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ];
+    
+    const STALE_TIMEOUT = 30000;
+    
+    // State
+    const cameras = new Map();
+    const slots = [null, null, null, null];
+    
+    function log(msg, type = '') {
+      console.log('[Regia]', msg);
+      const div = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+      div.insertBefore(entry, div.firstChild);
+      while (div.children.length > 30) div.removeChild(div.lastChild);
+    }
+    
+    // Listen for cameras - comp-specific path
+    DB.listen(streamsPath, (data) => {
+      if (!data) {
+        cameras.clear();
+        updateUI();
+        return;
+      }
+      
+      // Update cameras
+      for (const [id, info] of Object.entries(data)) {
+        if (!cameras.has(id)) {
+          cameras.set(id, { info, pc: null, stream: null, unsubscribers: [], addedCandidates: new Set() });
+          log(`Nuova camera: ${info.name}`, 'success');
+          
+          // AUTO-ASSIGN to slot based on position
+          if (info.position !== undefined && info.position >= 0 && info.position <= 3) {
+            const slotIdx = info.position;
+            if (!slots[slotIdx]) {
+              // Slot is free, auto-assign
+              setTimeout(() => assignToSlot(slotIdx, id), 500);
+              log(`Auto-assegnata ${info.name} a slot ${slotIdx}`, 'success');
+            }
+          }
+        } else {
+          cameras.get(id).info = info;
+        }
+      }
+      
+      // Remove old
+      for (const id of cameras.keys()) {
+        if (!data[id]) {
+          disconnect(id);
+          cameras.delete(id);
+          const idx = slots.indexOf(id);
+          if (idx >= 0) slots[idx] = null;
+        }
+      }
+      
+      updateUI();
+    });
+    
+    function updateUI() {
+      document.getElementById('camCount').textContent = cameras.size;
+      updateOutputSelect();
+      
+      // Update camera list
+      const list = document.getElementById('cameraList');
+      if (cameras.size === 0) {
+        list.innerHTML = '<div class="empty">In attesa di camere...<br>Apri camera-webrtc.html sui telefoni</div>';
+      } else {
+        list.innerHTML = Array.from(cameras.entries()).map(([id, cam]) => {
+          const assigned = slots.indexOf(id);
+          const slotNames = ['Lane 1', 'Lane 2', 'Lane 3', 'Overview'];
+          return `
+            <div class="camera-item">
+              <div class="dot ${cam.info.status || 'waiting'}"></div>
+              <div class="info">
+                <div class="name">${cam.info.name || 'Camera'}</div>
+                <div class="meta">${cam.info.quality || '?'}p</div>
+              </div>
+              ${assigned >= 0 ? `<span class="assigned">${slotNames[assigned]}</span>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // Update all dropdowns
+      const options = '<option value="">-- Seleziona Camera --</option>' + 
+        Array.from(cameras.entries()).map(([id, cam]) => 
+          `<option value="${id}">${cam.info.name || id}</option>`
+        ).join('');
+      
+      document.querySelectorAll('.slot select').forEach((sel, idx) => {
+        const current = sel.value;
+        sel.innerHTML = options;
+        sel.value = slots[idx] || '';
+      });
+      
+      // Update slot status
+      document.querySelectorAll('.slot').forEach((slot, idx) => {
+        const camId = slots[idx];
+        const status = slot.querySelector('.slot-status');
+        const hasVideo = camId && cameras.get(camId)?.stream;
+        slot.classList.toggle('has-video', !!hasVideo);
+        status.classList.toggle('live', !!hasVideo);
+      });
+    }
+    
+    window.assignToSlot = async (slotIdx, camId) => {
+      // Remove old camera from this slot
+      if (slots[slotIdx]) {
+        disconnect(slots[slotIdx]);
+      }
+      
+      slots[slotIdx] = camId || null;
+      
+      const slot = document.querySelector(`[data-slot="${slotIdx}"]`);
+      const video = slot.querySelector('video');
+      
+      if (!camId) {
+        video.srcObject = null;
+        updateUI();
+        return;
+      }
+      
+      log(`Connessione a ${cameras.get(camId)?.info?.name}...`);
+      await connect(camId, slotIdx);
+      updateUI();
+    };
+    
+    function disconnect(camId) {
+      const cam = cameras.get(camId);
+      if (!cam) return;
+      
+      cam.unsubscribers.forEach(fn => fn?.());
+      cam.unsubscribers = [];
+      
+      if (cam.pc) {
+        cam.pc.close();
+        cam.pc = null;
+      }
+      cam.stream = null;
+      cam.addedCandidates.clear();
+    }
+    
+    async function connect(camId, slotIdx) {
+      const cam = cameras.get(camId);
+      if (!cam) return;
+      
+      disconnect(camId);
+      cam.addedCandidates = new Set();
+      
+      // Clear old signaling
+      try {
+        await DB.remove(`${streamsPath}/${camId}/viewerOffer`);
+        await DB.remove(`${streamsPath}/${camId}/viewerCandidates`);
+        await DB.remove(`${streamsPath}/${camId}/viewerAnswer`);
+        await DB.remove(`${streamsPath}/${camId}/viewerCameraCandidates`);
+      } catch(e) {}
+      
+      await new Promise(r => setTimeout(r, 200));
+      
+      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      cam.pc = pc;
+      
+      const slot = document.querySelector(`[data-slot="${slotIdx}"]`);
+      const video = slot.querySelector('video');
+      
+      pc.ontrack = (e) => {
+        log(`Video ricevuto: ${cam.info.name}`, 'success');
+        cam.stream = e.streams[0];
+        video.srcObject = e.streams[0];
+        updateUI();
+      };
+      
+      pc.onicecandidate = async (e) => {
+        if (e.candidate) {
+          // Skip mDNS
+          if (e.candidate.candidate.includes('.local')) {
+            log('Skip mDNS');
+            return;
+          }
+          const id = `${Date.now()}_${Math.random().toString(36).substr(2,4)}`;
+          await DB.set(`${streamsPath}/${camId}/viewerCandidates/${id}`, e.candidate.toJSON());
+        }
+      };
+      
+      pc.onconnectionstatechange = () => {
+        log(`${cam.info.name}: ${pc.connectionState}`);
+        if (pc.connectionState === 'failed') {
+          log(`Connessione fallita: ${cam.info.name}`, 'error');
+        }
+        updateUI();
+      };
+      
+      // Create offer
+      pc.addTransceiver('video', { direction: 'recvonly' });
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      
+      await DB.set(`${streamsPath}/${camId}/viewerOffer`, { type: offer.type, sdp: offer.sdp });
+      log(`Offer inviato a ${cam.info.name}`);
+      
+      // Listen for answer, then candidates
+      let candidatesStarted = false;
+      
+      const unsubAnswer = DB.listen(`${streamsPath}/${camId}/viewerAnswer`, async (answer) => {
+        if (!answer || !pc || pc.signalingState === 'stable') return;
+        try {
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+          log(`Answer da ${cam.info.name}`, 'success');
+          
+          if (!candidatesStarted) {
+            candidatesStarted = true;
+            startCandidateListener();
+          }
+        } catch(e) {
+          log(`Errore answer: ${e.message}`, 'error');
+        }
+      });
+      cam.unsubscribers.push(unsubAnswer);
+      
+      function startCandidateListener() {
+        const unsubCands = DB.listen(`${streamsPath}/${camId}/viewerCameraCandidates`, async (cands) => {
+          if (!cands || !pc) return;
+          for (const [id, cand] of Object.entries(cands)) {
+            if (cam.addedCandidates.has(id)) continue;
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(cand));
+              cam.addedCandidates.add(id);
+            } catch(e) {}
+          }
+        });
+        cam.unsubscribers.push(unsubCands);
+      }
+    }
+    
+    window.refreshAll = async () => {
+      log('Riconnessione tutte...');
+      for (let i = 0; i < 4; i++) {
+        if (slots[i]) {
+          const camId = slots[i];
+          await connect(camId, i);
+          await new Promise(r => setTimeout(r, 300));
+        }
+      }
+    };
+    
+    window.cleanupAll = async () => {
+      if (!confirm('Rimuovere tutte le camere da Firebase?')) return;
+      await DB.remove(streamsPath);
+      log('Tutte le camere rimosse');
+    };
+    
+    // === OUTPUT CONTROL ===
+    window.setOutputCamera = async (camId) => {
+      await DB.set(`${outputConfigPath}/camera`, camId || null);
+      log(`Output camera: ${camId || 'nessuna'}`);
+    };
+    
+    window.sendToOutput = async () => {
+      // Find first slot with video and send to output
+      for (let i = 0; i < 4; i++) {
+        if (slots[i]) {
+          await DB.set(`${outputConfigPath}/camera`, slots[i]);
+          document.getElementById('outputCameraSelect').value = slots[i];
+          log(`Mandato a output: ${cameras.get(slots[i])?.info?.name || slots[i]}`, 'success');
+          return;
+        }
+      }
+      alert('Nessuna camera connessa');
+    };
+    
+    window.updateOverlay = async () => {
+      const config = {
+        logo: document.getElementById('ovLogo').checked,
+        live: document.getElementById('ovLive').checked,
+        timer: document.getElementById('ovTimer').checked,
+        wod: document.getElementById('ovWod').checked
+      };
+      await DB.set(`${outputConfigPath}/overlay`, config);
+      log('Overlay aggiornate');
+    };
+    
+    // Update output camera select when cameras change
+    function updateOutputSelect() {
+      const select = document.getElementById('outputCameraSelect');
+      const current = select.value;
+      select.innerHTML = '<option value="">-- Nessuna --</option>' +
+        Array.from(cameras.entries()).map(([id, cam]) =>
+          `<option value="${id}">${cam.info.name || id}</option>`
+        ).join('');
+      select.value = current;
+    }
+    
+    // Load initial overlay config
+    DB.get(`${outputConfigPath}/overlay`).then(config => {
+      if (config) {
+        document.getElementById('ovLogo').checked = config.logo !== false;
+        document.getElementById('ovLive').checked = config.live !== false;
+        document.getElementById('ovTimer').checked = config.timer !== false;
+        document.getElementById('ovWod').checked = config.wod === true;
+      }
+    });
+    
+    log('Regia avviata', 'success');
+    
+    // Fullscreen output mode
+    let fsSlot = null;
+    
+    window.goFullscreen = () => {
+      // Find first slot with video
+      for (let i = 0; i < 4; i++) {
+        if (slots[i]) {
+          const cam = cameras.get(slots[i]);
+          if (cam?.stream) {
+            fsSlot = i;
+            document.getElementById('fsVideo').srcObject = cam.stream;
+            document.getElementById('fullscreenOutput').classList.add('active');
+            document.documentElement.requestFullscreen?.();
+            return;
+          }
+        }
+      }
+      alert('Nessun video disponibile');
+    };
+    
+    window.exitFullscreen = () => {
+      document.getElementById('fullscreenOutput').classList.remove('active');
+      document.exitFullscreen?.();
+    };
+    
+    // ESC to exit
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') exitFullscreen();
+    });
+    
+    // Double-click slot to fullscreen
+    document.querySelectorAll('.slot-video').forEach((el, idx) => {
+      el.addEventListener('dblclick', () => {
+        if (slots[idx]) {
+          const cam = cameras.get(slots[idx]);
+          if (cam?.stream) {
+            fsSlot = idx;
+            document.getElementById('fsVideo').srcObject = cam.stream;
+            document.getElementById('fullscreenOutput').classList.add('active');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

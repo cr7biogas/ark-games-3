@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>🏆 Season - ARK Games</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    
+    .header {
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .header a { color: #888; text-decoration: none; font-size: 1.5rem; }
+    .header h1 { font-size: 1.2rem; flex: 1; }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .hero-emoji { font-size: 4rem; margin-bottom: 15px; }
+    .hero h1 { font-size: 1.8rem; margin-bottom: 10px; }
+    .hero p { color: #888; }
+    
+    .status-banner {
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .status-registration { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+    .status-active { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+    .status-completed { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+    
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h3 { margin-bottom: 15px; color: #f39c12; }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .info-item {
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .info-item .icon { font-size: 1.5rem; margin-bottom: 5px; }
+    .info-item .value { font-size: 1.3rem; font-weight: 700; }
+    .info-item .label { color: #888; font-size: 0.8rem; }
+    
+    .wod-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wod-item {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .wod-item .week {
+      background: #e94560;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .wod-item .info { flex: 1; }
+    .wod-item .info h4 { font-size: 0.95rem; margin-bottom: 2px; }
+    .wod-item .info p { color: #888; font-size: 0.8rem; }
+    .wod-item.completed { opacity: 0.5; }
+    .wod-item.completed .week { background: #27ae60; }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 2px solid #333;
+      background: rgba(0,0,0,0.3);
+      color: white;
+      font-size: 1rem;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+    
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    .calendar .day-header {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #888;
+      padding: 5px 0;
+    }
+    .calendar .day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.05);
+      transition: all 0.2s;
+    }
+    .calendar .day:hover { background: rgba(255,255,255,0.1); }
+    .calendar .day.disabled { opacity: 0.3; cursor: not-allowed; }
+    .calendar .day.available { background: #27ae60; color: white; }
+    .calendar .day.slot-day { border: 2px solid #f39c12; }
+    .calendar .day.today { box-shadow: inset 0 0 0 2px #e94560; }
+    .calendar .day.full { background: #c0392b !important; color: white; cursor: not-allowed; opacity: 0.8; }
+    .calendar .day.almost-full { background: #e67e22; color: white; }
+    
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .month-nav button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      cursor: pointer;
+    }
+    .month-nav span { font-weight: 600; }
+    
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #e94560; color: white; }
+    .btn-primary:hover { background: #d63850; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .leaderboard-table th, .leaderboard-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .leaderboard-table th { color: #888; font-weight: 500; font-size: 0.85rem; }
+    .leaderboard-table .pos { font-weight: 700; color: #f39c12; }
+    .leaderboard-table .highlight { background: rgba(233, 69, 96, 0.1); }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      color: #888;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .tab.active { background: #e94560; color: white; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 15px; }
+    
+    /* Registration form */
+    .register-form {
+      display: none;
+    }
+    .register-form.active {
+      display: block;
+    }
+    
+    /* Team profile section */
+    .team-profile {
+      display: none;
+    }
+    .team-profile.active {
+      display: block;
+    }
+    
+    .team-badge {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .team-badge .emoji { font-size: 2.5rem; }
+    .team-badge .info h3 { margin-bottom: 4px; }
+    .team-badge .info p { color: #888; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="./">←</a>
+    <h1 id="pageTitle">🏆 Season</h1>
+  </div>
+  
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero" id="heroSection">
+      <div class="hero-emoji" id="seasonEmoji">🏆</div>
+      <h1 id="seasonName">Caricamento...</h1>
+      <p id="seasonDates">-</p>
+    </div>
+    
+    <div class="status-banner status-registration" id="statusBanner">
+      📨 Iscrizioni Aperte
+    </div>
+    
+    <!-- Tabs for registered users -->
+    <div class="tabs" id="mainTabs" style="display:none;">
+      <button class="tab active" data-tab="info">📋 Info</button>
+      <button class="tab" data-tab="availability">📅 Disponibilità</button>
+      <button class="tab" data-tab="schedule">🗓️ Calendario</button>
+      <button class="tab" data-tab="leaderboard">🏆 Classifica</button>
+    </div>
+    
+    <!-- Registration Form (for new teams) -->
+    <div class="register-form active" id="registerForm">
+      <div class="card">
+        <h3>👥 Iscrivi il tuo Team</h3>
+        <div class="form-group">
+          <label>Nome Team</label>
+          <input type="text" id="teamName" placeholder="Es: Team Alfa">
+        </div>
+        <div class="form-group">
+          <label>Emoji Team</label>
+          <select id="teamEmoji">
+            <option value="🦁">🦁 Leone</option>
+            <option value="🐺">🐺 Lupo</option>
+            <option value="🦅">🦅 Aquila</option>
+            <option value="🐻">🐻 Orso</option>
+            <option value="🦈">🦈 Squalo</option>
+            <option value="🐯">🐯 Tigre</option>
+            <option value="🦍">🦍 Gorilla</option>
+            <option value="🐲">🐲 Drago</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="teamCategory">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Email Capitano</label>
+          <input type="email" id="teamEmail" placeholder="email@esempio.com">
+        </div>
+        <div class="form-group">
+          <label>Telefono (opzionale)</label>
+          <input type="tel" id="teamPhone" placeholder="+39...">
+        </div>
+        <button class="btn btn-primary" onclick="registerTeam()">✅ Iscriviti alla Season</button>
+      </div>
+    </div>
+    
+    <!-- Team Profile (for registered teams) -->
+    <div class="team-profile" id="teamProfile">
+      <div class="team-badge" id="teamBadge">
+        <div class="emoji">🦁</div>
+        <div class="info">
+          <h3>Team Name</h3>
+          <p>Categoria · 0/0 WOD</p>
+        </div>
+      </div>
+      
+      <!-- INFO TAB -->
+      <div class="tab-content active" id="tab-info">
+        <div class="card">
+          <h3>📊 Info Season</h3>
+          <div class="info-grid" id="seasonInfo">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>🏋️ WOD della Season</h3>
+          <div class="wod-list" id="wodList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- AVAILABILITY TAB -->
+      <div class="tab-content" id="tab-availability">
+        <div class="card">
+          <h3>📅 Indica la tua Disponibilità</h3>
+          
+          <!-- Availability Status -->
+          <div id="availabilityStatus" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:10px;padding:15px;margin-bottom:15px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span>📊 Disponibilità indicate:</span>
+              <strong id="availCount">0 / 0 minimo</strong>
+            </div>
+            <div style="margin-top:8px;background:rgba(0,0,0,0.2);border-radius:5px;height:8px;overflow:hidden;">
+              <div id="availProgress" style="height:100%;background:#e74c3c;transition:all 0.3s;width:0%;"></div>
+            </div>
+            <p id="availMessage" style="margin-top:8px;font-size:0.85rem;color:#e74c3c;">
+              ⚠️ Indica almeno X date per partecipare a tutti i WOD
+            </p>
+          </div>
+          
+          <p style="color:#888;margin-bottom:15px;font-size:0.9rem;">
+            Clicca sui giorni in cui il tuo team può partecipare. I giorni evidenziati in arancione sono i giorni di gara.<br>
+            <strong>ℹ️ Ogni evento include 2 WOD.</strong>
+          </p>
+          
+          <div class="month-nav">
+            <button onclick="changeMonth(-1)">← Prec</button>
+            <span id="currentMonth">Marzo 2026</span>
+            <button onclick="changeMonth(1)">Succ →</button>
+          </div>
+          
+          <div class="calendar" id="calendar">
+            <div class="day-header">Lun</div>
+            <div class="day-header">Mar</div>
+            <div class="day-header">Mer</div>
+            <div class="day-header">Gio</div>
+            <div class="day-header">Ven</div>
+            <div class="day-header">Sab</div>
+            <div class="day-header">Dom</div>
+            <!-- Days populated dynamically -->
+          </div>
+          
+          <p style="color:#888;font-size:0.85rem;margin-bottom:15px;">
+            <span style="display:inline-block;width:12px;height:12px;background:#27ae60;border-radius:3px;"></span> Disponibile
+            <span style="display:inline-block;width:12px;height:12px;border:2px solid #f39c12;border-radius:3px;margin-left:10px;"></span> Giorno gara
+            <span style="display:inline-block;width:12px;height:12px;background:#e67e22;border-radius:3px;margin-left:10px;"></span> Quasi pieno
+            <span style="display:inline-block;width:12px;height:12px;background:#c0392b;border-radius:3px;margin-left:10px;"></span> Pieno
+          </p>
+          
+          <button class="btn btn-success" onclick="saveAvailability()">💾 Salva Disponibilità</button>
+        </div>
+      </div>
+      
+      <!-- SCHEDULE TAB -->
+      <div class="tab-content" id="tab-schedule">
+        <div class="card">
+          <h3>🗓️ Il Tuo Calendario</h3>
+          <div id="mySchedule">
+            <div class="empty-state">
+              <div class="icon">📅</div>
+              <p>Il calendario verrà generato in base alle disponibilità</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- LEADERBOARD TAB -->
+      <div class="tab-content" id="tab-leaderboard">
+        <div class="card">
+          <h3>🏆 Classifica Season</h3>
+          <div id="leaderboardContainer">
+            <div class="empty-state">
+              <div class="icon">🏆</div>
+              <p>La classifica apparirà quando iniziano le gare</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { DB } from '../firebase-config.js';
+    
+    const params = new URLSearchParams(location.search);
+    const seasonId = params.get('id');
+    
+    if (!seasonId) {
+      alert('ID Season mancante nell\'URL');
+      location.href = './';
+    }
+    
+    // Show loading state
+    document.getElementById('seasonName').textContent = 'Caricamento...';
+    document.getElementById('seasonDates').textContent = '';
+    
+    let season = {};
+    let wods = [];
+    let teams = {};
+    let allTeamsAvailability = {}; // { date: count }
+    let myTeam = null;
+    let myTeamId = null;
+    let schedule = {};
+    let availability = [];
+    let currentCalendarMonth = new Date();
+    
+    // Check if team already registered
+    const savedTeam = localStorage.getItem(`ark_season_team_${seasonId}`);
+    if (savedTeam) {
+      myTeamId = savedTeam;
+    }
+    
+    // Load season data
+    async function loadSeason() {
+      season = await DB.get(`seasons/${seasonId}`);
+      
+      // Error if season doesn't exist
+      if (!season) {
+        alert('❌ Season non trovata!\n\nVerifica che l\'ID sia corretto.');
+        location.href = './';
+        return;
+      }
+      
+      wods = Object.entries(await DB.get(`seasons/${seasonId}/workouts`) || {}).map(([id, w]) => ({...w, id}));
+      teams = await DB.get(`seasons/${seasonId}/teams`) || {};
+      schedule = await DB.get(`seasons/${seasonId}/schedule`) || {};
+      
+      // Calculate availability count per date (for capacity check)
+      allTeamsAvailability = {};
+      Object.values(teams).forEach(team => {
+        (team.availability || []).forEach(date => {
+          allTeamsAvailability[date] = (allTeamsAvailability[date] || 0) + 1;
+        });
+      });
+      
+      // Update UI
+      document.getElementById('seasonEmoji').textContent = season.emoji || '🏆';
+      document.getElementById('seasonName').textContent = season.name || 'Season';
+      document.getElementById('pageTitle').textContent = season.name || 'Season';
+      document.getElementById('seasonDates').textContent = `${formatDate(season.startDate)} - ${formatDate(season.endDate)}`;
+      
+      // Status banner
+      const banner = document.getElementById('statusBanner');
+      const statusLabels = {
+        draft: { text: '📝 Prossimamente', class: 'status-registration' },
+        registration: { text: '📨 Iscrizioni Aperte', class: 'status-registration' },
+        active: { text: '🟢 In Corso', class: 'status-active' },
+        completed: { text: '✅ Completata', class: 'status-completed' }
+      };
+      const status = statusLabels[season.status] || statusLabels.draft;
+      banner.textContent = status.text;
+      banner.className = 'status-banner ' + status.class;
+      
+      // Populate categories dropdown
+      const catSelect = document.getElementById('teamCategory');
+      catSelect.innerHTML = (season.categories || ['RX', 'Scaled']).map(c => 
+        `<option value="${c}">${c}</option>`
+      ).join('');
+      
+      // Check if already registered
+      if (myTeamId) {
+        myTeam = await DB.get(`seasons/${seasonId}/teams/${myTeamId}`);
+        if (myTeam) {
+          availability = myTeam.availability || [];
+          showTeamProfile();
+        } else {
+          myTeamId = null;
+          localStorage.removeItem(`ark_season_team_${seasonId}`);
+        }
+      }
+      
+      renderInfo();
+      renderWods();
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      return new Date(dateStr).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    
+    function showTeamProfile() {
+      document.getElementById('registerForm').classList.remove('active');
+      document.getElementById('teamProfile').classList.add('active');
+      document.getElementById('mainTabs').style.display = 'flex';
+      
+      // Update team badge
+      document.getElementById('teamBadge').innerHTML = `
+        <div class="emoji">${myTeam.emoji || '🏆'}</div>
+        <div class="info">
+          <h3>${myTeam.name}</h3>
+          <p>${myTeam.category} · ${(myTeam.completedWods || []).length}/${wods.length} WOD</p>
+        </div>
+      `;
+      
+      renderCalendar();
+      renderMySchedule();
+      renderLeaderboard();
+      updateAvailabilityStatus();
+    }
+    
+    function renderInfo() {
+      const weeks = Math.ceil((new Date(season.endDate) - new Date(season.startDate)) / (7 * 24 * 60 * 60 * 1000));
+      const dayNames = { saturday: 'Sabato', sunday: 'Domenica', friday: 'Venerdì' };
+      const teamCount = Object.keys(teams).length;
+      
+      const prizeHtml = season.prizePool && season.prizePool.trim() ? `
+        <div class="info-item" style="background:linear-gradient(135deg,rgba(241,196,15,0.2),rgba(243,156,18,0.2));border:1px solid rgba(241,196,15,0.3);grid-column:1/-1;">
+          <div class="icon">🏆</div>
+          <div class="value" style="color:#f1c40f;font-size:1rem;">Monte Premi</div>
+          <div class="label" style="text-align:left;white-space:pre-line;margin-top:10px;">${season.prizePool}</div>
+        </div>
+      ` : '';
+      
+      document.getElementById('seasonInfo').innerHTML = `
+        ${prizeHtml}
+        <div class="info-item">
+          <div class="icon">📅</div>
+          <div class="value">${weeks}</div>
+          <div class="label">Settimane</div>
+        </div>
+        <div class="info-item">
+          <div class="icon">🏋️</div>
+          <div class="value">${wods.length}</div>
+          <div class="label">WOD</div>
+        </div>
+        <div class="info-item">
+          <div class="icon">👥</div>
+          <div class="value">${teamCount}</div>
+          <div class="label">Team Iscritti</div>
+        </div>
+        <div class="info-item">
+          <div class="icon">📆</div>
+          <div class="value">${dayNames[season.slotDay] || 'TBD'}</div>
+          <div class="label">Giorno Gara</div>
+        </div>
+      `;
+    }
+    
+    function renderWods() {
+      const list = document.getElementById('wodList');
+      if (wods.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">🏋️</div><p>WOD in arrivo</p></div>';
+        return;
+      }
+      
+      wods.sort((a, b) => (a.weekNumber || 0) - (b.weekNumber || 0));
+      const completedWods = myTeam?.completedWods || [];
+      
+      list.innerHTML = wods.map(w => `
+        <div class="wod-item ${completedWods.includes(w.id) ? 'completed' : ''}">
+          <div class="week">${w.weekNumber || '?'}</div>
+          <div class="info">
+            <h4>${w.name}</h4>
+            <p>${(w.type || 'For Time').toUpperCase()} · ${Math.round((w.timeCapSec || 600) / 60)} min</p>
+          </div>
+          ${completedWods.includes(w.id) ? '<span style="color:#27ae60">✓</span>' : ''}
+        </div>
+      `).join('');
+    }
+    
+    // Calendar functions
+    function renderCalendar() {
+      const cal = document.getElementById('calendar');
+      const year = currentCalendarMonth.getFullYear();
+      const month = currentCalendarMonth.getMonth();
+      
+      document.getElementById('currentMonth').textContent = 
+        currentCalendarMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+      
+      // Keep day headers
+      let html = `
+        <div class="day-header">Lun</div>
+        <div class="day-header">Mar</div>
+        <div class="day-header">Mer</div>
+        <div class="day-header">Gio</div>
+        <div class="day-header">Ven</div>
+        <div class="day-header">Sab</div>
+        <div class="day-header">Dom</div>
+      `;
+      
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startPad = (firstDay.getDay() + 6) % 7; // Monday = 0
+      
+      const dayMap = { saturday: 6, sunday: 0, friday: 5 };
+      const slotDayNum = dayMap[season.slotDay];
+      const today = new Date().toISOString().split('T')[0];
+      const startDate = season.startDate;
+      const endDate = season.endDate;
+      
+      // Padding for first week
+      for (let i = 0; i < startPad; i++) {
+        html += '<div class="day disabled"></div>';
+      }
+      
+      // Get max capacity per event
+      const maxTeamsPerEvent = season.maxTeamsPerEvent?.maxTeamsTotal || 
+                               ((season.eventDuration || 4) * 60 / (season.heatDuration || 15)) * (season.numLanes || 4) * 
+                               (season.categories?.length || 3);
+      
+      // Days
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const date = new Date(year, month, d);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayOfWeek = date.getDay();
+        
+        const isSlotDay = dayOfWeek === slotDayNum;
+        const isAvailable = availability.includes(dateStr);
+        const isToday = dateStr === today;
+        const isInRange = dateStr >= startDate && dateStr <= endDate;
+        const isPast = dateStr < today;
+        
+        // Check capacity
+        const currentCount = allTeamsAvailability[dateStr] || 0;
+        const isFull = currentCount >= maxTeamsPerEvent;
+        const isAlmostFull = currentCount >= maxTeamsPerEvent * 0.8;
+        
+        const classes = [
+          'day',
+          isSlotDay && isInRange ? 'slot-day' : '',
+          isAvailable ? 'available' : '',
+          isToday ? 'today' : '',
+          (isPast || !isInRange) ? 'disabled' : '',
+          (isFull && !isAvailable) ? 'full' : '',
+          (isAlmostFull && !isFull && !isAvailable) ? 'almost-full' : ''
+        ].filter(Boolean).join(' ');
+        
+        // Can't click if full (unless already selected)
+        const clickable = isSlotDay && isInRange && !isPast && (!isFull || isAvailable);
+        
+        // Show count on slot days
+        const countLabel = isSlotDay && isInRange && !isPast ? 
+          `<span style="font-size:0.65rem;display:block;margin-top:2px;">${currentCount}/${maxTeamsPerEvent}</span>` : '';
+        
+        html += `<div class="${classes}" ${clickable ? `onclick="toggleDay('${dateStr}')"` : ''} 
+                  ${isFull && !isAvailable ? 'title="Giorno pieno - non disponibile"' : ''}>${d}${countLabel}</div>`;
+      }
+      
+      cal.innerHTML = html;
+    }
+    
+    window.toggleDay = (dateStr) => {
+      const idx = availability.indexOf(dateStr);
+      if (idx >= 0) {
+        // Removing availability
+        availability.splice(idx, 1);
+        allTeamsAvailability[dateStr] = Math.max(0, (allTeamsAvailability[dateStr] || 1) - 1);
+      } else {
+        // Adding availability - check if full first
+        const maxTeamsPerEvent = season.maxTeamsPerEvent?.maxTeamsTotal || 
+                                 ((season.eventDuration || 4) * 60 / (season.heatDuration || 15)) * (season.numLanes || 4) * 
+                                 (season.categories?.length || 3);
+        const currentCount = allTeamsAvailability[dateStr] || 0;
+        
+        if (currentCount >= maxTeamsPerEvent) {
+          alert('⚠️ Questo giorno è pieno!\n\nScegli un\'altra data.');
+          return;
+        }
+        
+        availability.push(dateStr);
+        allTeamsAvailability[dateStr] = (allTeamsAvailability[dateStr] || 0) + 1;
+      }
+      renderCalendar();
+      updateAvailabilityStatus();
+    };
+    
+    function updateAvailabilityStatus() {
+      // Calculate minimum events needed (2 WOD per event)
+      const totalWods = wods.length;
+      const minEvents = Math.ceil(totalWods / 2);
+      const currentAvail = availability.length;
+      
+      // Update UI
+      const countEl = document.getElementById('availCount');
+      const progressEl = document.getElementById('availProgress');
+      const messageEl = document.getElementById('availMessage');
+      const statusEl = document.getElementById('availabilityStatus');
+      
+      countEl.textContent = `${currentAvail} / ${minEvents} minimo`;
+      
+      const percent = Math.min(100, (currentAvail / minEvents) * 100);
+      progressEl.style.width = percent + '%';
+      
+      if (currentAvail >= minEvents) {
+        progressEl.style.background = '#27ae60';
+        statusEl.style.background = 'rgba(39,174,96,0.1)';
+        statusEl.style.borderColor = 'rgba(39,174,96,0.3)';
+        messageEl.style.color = '#27ae60';
+        messageEl.textContent = `✅ Perfetto! Hai indicato abbastanza disponibilità per completare tutti i ${totalWods} WOD.`;
+      } else {
+        progressEl.style.background = '#e74c3c';
+        statusEl.style.background = 'rgba(231,76,60,0.1)';
+        statusEl.style.borderColor = 'rgba(231,76,60,0.3)';
+        messageEl.style.color = '#e74c3c';
+        const missing = minEvents - currentAvail;
+        messageEl.textContent = `⚠️ Indica almeno ${missing} ${missing === 1 ? 'altra data' : 'altre date'} per partecipare a tutti i ${totalWods} WOD (2 WOD per evento).`;
+      }
+    }
+    
+    window.changeMonth = (delta) => {
+      currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + delta);
+      renderCalendar();
+    };
+    
+    window.saveAvailability = async () => {
+      if (!myTeamId) return;
+      
+      const totalWods = wods.length;
+      const minEvents = Math.ceil(totalWods / 2);
+      
+      if (availability.length < minEvents) {
+        const proceed = confirm(
+          `⚠️ Attenzione!\n\n` +
+          `Hai indicato solo ${availability.length} disponibilità, ma ne servono almeno ${minEvents} per completare tutti i ${totalWods} WOD.\n\n` +
+          `Vuoi salvare comunque? Potresti non riuscire a completare la season.`
+        );
+        if (!proceed) return;
+      }
+      
+      await DB.update(`seasons/${seasonId}/teams/${myTeamId}`, {
+        availability: availability,
+        updatedAt: Date.now()
+      });
+      
+      myTeam.availability = availability;
+      
+      if (availability.length >= minEvents) {
+        alert('✅ Disponibilità salvata!\n\nSei pronto per partecipare a tutti i WOD della season.');
+      } else {
+        alert('⚠️ Disponibilità salvata.\n\nRicorda di aggiungere altre date quando possibile!');
+      }
+    };
+    
+    function renderMySchedule() {
+      const container = document.getElementById('mySchedule');
+      if (!myTeamId) return;
+      
+      // Find dates where my team is scheduled
+      const myDates = Object.entries(schedule).filter(([date, week]) => {
+        const slots = week.slots || {};
+        return Object.values(slots).some(teams => teams.includes(myTeamId));
+      });
+      
+      if (myDates.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">📅</div><p>Non sei ancora programmato. Indica le tue disponibilità!</p></div>';
+        return;
+      }
+      
+      container.innerHTML = myDates.map(([date, week]) => {
+        // Support both old (wodId) and new (wodIds) format
+        const eventWodIds = week.wodIds || [week.wodId];
+        const eventWods = eventWodIds.map(id => wods.find(w => w.id === id)).filter(Boolean);
+        
+        return `
+          <div class="wod-item" style="flex-direction:column;align-items:stretch;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div class="week" style="background:#f39c12;width:auto;padding:8px 12px;">
+                📅 ${formatDate(date)}
+              </div>
+              <span style="color:#888;font-size:0.85rem;">${week.status || 'Programmato'}</span>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              ${eventWods.map(wod => `
+                <div style="flex:1;min-width:120px;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;">
+                  <div style="font-weight:600;">${wod?.name || 'TBD'}</div>
+                  <div style="color:#888;font-size:0.8rem;">${wod?.type || 'For Time'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderLeaderboard() {
+      // TODO: Calculate from scores
+      document.getElementById('leaderboardContainer').innerHTML = `
+        <div class="empty-state"><div class="icon">🏆</div><p>In arrivo...</p></div>
+      `;
+    }
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      };
+    });
+    
+    // Registration
+    window.registerTeam = async () => {
+      const name = document.getElementById('teamName').value.trim();
+      const emoji = document.getElementById('teamEmoji').value;
+      const category = document.getElementById('teamCategory').value;
+      const email = document.getElementById('teamEmail').value.trim();
+      const phone = document.getElementById('teamPhone').value.trim();
+      
+      if (!name) {
+        alert('Inserisci il nome del team');
+        return;
+      }
+      if (!email) {
+        alert('Inserisci l\'email del capitano');
+        return;
+      }
+      if (!email.includes('@') || !email.includes('.')) {
+        alert('Inserisci un\'email valida');
+        return;
+      }
+      
+      const teamId = 'team_' + Date.now();
+      const teamData = {
+        name,
+        emoji,
+        category,
+        email,
+        phone,
+        availability: [],
+        completedWods: [],
+        registeredAt: Date.now()
+      };
+      
+      await DB.set(`seasons/${seasonId}/teams/${teamId}`, teamData);
+      
+      // Save locally
+      localStorage.setItem(`ark_season_team_${seasonId}`, teamId);
+      myTeamId = teamId;
+      myTeam = teamData;
+      
+      alert('✅ Iscrizione completata!\n\nOra indica le tue disponibilità.');
+      showTeamProfile();
+      
+      // Switch to availability tab
+      document.querySelector('[data-tab="availability"]').click();
+    };
+    
+    // Init
+    loadSeason();
+  </script>
+</body>
+</html>
