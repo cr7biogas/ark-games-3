@@ -637,6 +637,9 @@ Open</textarea>
       loadTimeline();
       loadRegistrationConfig();
       loadJudgeConfig();
+      
+      // Update teams tab visibility based on teamMode
+      setTimeout(updateTeamsTabVisibility, 100);
     }
     
     async function loadJudgeConfig() {
@@ -695,8 +698,13 @@ Open</textarea>
       
       // Set registration URL
       const baseUrl = location.origin;
-      const regUrl = `${baseUrl}/register.html?c=${compId}`;
+      const regUrl = `${baseUrl}/app/iscrizione.html?c=${compId}`;
       document.getElementById('regUrl').value = regUrl;
+      
+      // Sync regType with competition.teamMode
+      if (competition.teamMode !== undefined) {
+        document.getElementById('regType').value = competition.teamMode ? 'team' : 'single';
+      }
       
       loadRegistrations();
     }
@@ -707,9 +715,30 @@ Open</textarea>
       const status = document.getElementById('regStatus').value;
       const teamSize = document.getElementById('regTeamSize').value;
       
+      // Save registration config
       await DB.set(`${basePath}/registration`, { type, price, status, teamSize });
+      
+      // Also update competition.teamMode for consistency
+      const isTeam = type === 'team';
+      await DB.update(`${basePath}`, { teamMode: isTeam });
+      competition.teamMode = isTeam;
+      
+      // Show/hide Teams tab based on mode
+      updateTeamsTabVisibility();
+      
       alert('✅ Configurazione iscrizioni salvata!');
     };
+    
+    function updateTeamsTabVisibility() {
+      const teamsTab = document.querySelector('[data-tab="teams"]');
+      const isTeam = competition.teamMode === true || document.getElementById('regType').value === 'team';
+      teamsTab.style.display = isTeam ? '' : 'none';
+      
+      // If in individual mode and on teams tab, switch to another tab
+      if (!isTeam && document.getElementById('sec-teams').classList.contains('active')) {
+        document.querySelector('[data-tab="gara"]').click();
+      }
+    }
     
     window.copyRegUrl = () => {
       const url = document.getElementById('regUrl').value;
@@ -1004,7 +1033,7 @@ Open</textarea>
     // Set judge link
     function updateJudgeLink() {
       const param = isSeasonMode ? `s=${seasonId}` : `c=${compId}`;
-      const judgeUrl = `${location.origin}/judge?${param}`;
+      const judgeUrl = `${location.origin}/judge.html?${param}`;
       document.getElementById('judgeLink').value = judgeUrl;
     }
     
