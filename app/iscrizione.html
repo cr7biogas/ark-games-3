@@ -425,8 +425,8 @@
         priceEl.textContent = '€' + price;
       }
       
-      // Form type (single vs team)
-      const isTeam = registrationConfig?.type === 'team';
+      // Form type (single vs team) - check competition.teamMode
+      const isTeam = competition.teamMode === true || registrationConfig?.type === 'team';
       document.getElementById('formTitle').textContent = isTeam ? '👥 Iscrivi il Team' : '🏃 Iscriviti';
       document.getElementById('singleForm').style.display = isTeam ? 'none' : 'block';
       document.getElementById('teamForm').style.display = isTeam ? 'block' : 'none';
@@ -475,7 +475,7 @@
         return;
       }
       
-      const isTeam = registrationConfig?.type === 'team';
+      const isTeam = competition.teamMode === true || registrationConfig?.type === 'team';
       let data = {
         category: selectedCategory,
         notes: document.getElementById('notes').value.trim(),

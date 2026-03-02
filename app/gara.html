@@ -221,6 +221,11 @@
               <div class="label">Chiusura</div>
               <div class="value">${competition.regDeadline || 'Aperta'}</div>
             </div>
+            <div class="info-card" style="background:${competition.teamMode ? 'rgba(0,212,255,0.15)' : 'rgba(243,156,18,0.15)'};">
+              <div class="icon">${competition.teamMode ? '👥' : '🏃'}</div>
+              <div class="label">Modalità</div>
+              <div class="value" style="color:${competition.teamMode ? '#00d4ff' : '#f39c12'}">${competition.teamMode ? 'TEAM' : 'INDIVIDUALE'}</div>
+            </div>
           </div>
           
           ${wods.length > 0 ? `
@@ -284,6 +289,8 @@
       if (!regOpen) {
         btn.disabled = true;
         btn.textContent = competition.status === 'done' ? 'CONCLUSA' : 'ISCRIZIONI CHIUSE';
+      } else {
+        btn.textContent = competition.teamMode ? 'ISCRIVI TEAM →' : 'ISCRIVITI →';
       }
     }
     
