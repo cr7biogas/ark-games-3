@@ -674,8 +674,9 @@ Scaled</textarea>
     let selectedEmoji = '🏆';
     
     // Check auth
-    const session = localStorage.getItem('ark_admin_session');
-    if (!session) {
+    const adminEmail = localStorage.getItem('arkAdminEmail');
+    const adminSession = localStorage.getItem('arkAdminSession');
+    if (!adminEmail || !adminSession) {
       location.href = './';
     }
     
@@ -1104,10 +1105,10 @@ Scaled</textarea>
     
     window.saveDraft = async () => {
       const data = getFormData();
-      const session = JSON.parse(localStorage.getItem('ark_admin_session') || '{}');
+      const email = localStorage.getItem('arkAdminEmail') || '';
       data.status = 'draft';
-      data.adminId = session.id;
-      data.adminEmail = session.email;
+      data.adminId = email;
+      data.adminEmail = email;
       if (!competition.createdAt) data.createdAt = Date.now();
       data.updatedAt = Date.now();
       
@@ -1129,7 +1130,7 @@ Scaled</textarea>
     
     window.saveAndPublish = async () => {
       const data = getFormData();
-      const session = JSON.parse(localStorage.getItem('ark_admin_session') || '{}');
+      const email = localStorage.getItem('arkAdminEmail') || '';
       
       if (!data.name) {
         alert('Inserisci il nome della gara');
@@ -1141,8 +1142,8 @@ Scaled</textarea>
       }
       
       data.status = 'upcoming';
-      data.adminId = session.id;
-      data.adminEmail = session.email;
+      data.adminId = email;
+      data.adminEmail = email;
       if (!competition.createdAt) data.createdAt = Date.now();
       data.updatedAt = Date.now();
       

@@ -637,11 +637,12 @@ Beginner</textarea>
     let schedule = {};
     
     // Check auth
-    const session = localStorage.getItem('ark_admin_session');
-    if (!session) {
+    const adminEmail = localStorage.getItem('arkAdminEmail');
+    const adminSessionTime = localStorage.getItem('arkAdminSession');
+    if (!adminEmail || !adminSessionTime) {
       location.href = './';
     }
-    const adminSession = JSON.parse(session);
+    const adminSession = { email: adminEmail, id: adminEmail };
     
     // Logo state
     let currentLogo = null;
